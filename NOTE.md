@@ -14,6 +14,7 @@ sta sopra**. Dove sta la figura decide quali mosse hai: è questo il gioco.
 | `opera-core.js` | **il nucleo**: trasformazioni, legalità, risolutore, contorno del poliomino. Nessun DOM: gira uguale nel browser e in Node |
 | `opera-levels.js` | i venti quadri, generati e verificati (vedi sotto) |
 | `opera.js` | disegno, animazioni, partita |
+| `assets/` | icona e schermate d'avvio dell'APK (rigenerate da uno script PIL) |
 
 I riferimenti a css/js nell'HTML sono versionati (`?v=1`): **alzare il numero a
 ogni modifica**, altrimenti telefoni e WebView restano su una versione vecchia.
@@ -89,9 +90,34 @@ Attenzione: nel pannello di anteprima nascosto i timer vengono strozzati a ~1s,
 quindi le prove che campionano a metà animazione non funzionano. Si aspetta uno
 stato (il contatore delle mosse che cambia), non un tempo.
 
+## Pubblicazione
+
+- **Live**: <https://fithzhood.github.io/opera/opera.html>
+- **Repo**: `C:\Users\lfili\WebApps\opera` -> github.com/fithzhood/opera
+- **APK**: progetto Capacitor in `C:\Users\lfili\CapacitorApps\opera`, carica
+  l'URL remoto. Quindi **le modifiche al web non richiedono una nuova build**:
+  basta un `git push` e riaprire l'app. Si ricostruisce solo se cambia qualcosa
+  di nativo (icona, nome, permessi, orientamento).
+- L'APK non blocca la rotazione: si gioca sia in verticale sia coricato.
+
+### Le barre di sistema su Android 15
+
+`setSystemUiVisibility` **non nasconde piu' niente** sulle app moderne: serve
+`WindowInsetsControllerCompat.hide(systemBars())`, rimesso in
+`onWindowFocusChanged`, piu' `LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES` e un
+`android:windowBackground` scuro, altrimenti resta una fascia chiara.
+
+### L'icona e la maschera tonda
+
+Il segno sta in diagonale (figura in alto a sinistra, sagoma in basso a destra) e
+la maschera del launcher taglia proprio gli angoli. Nel primo piano dell'icona
+adattiva il disegno va quindi tenuto entro il ~70% del lato, cioe' dentro il
+cerchio inscritto. Dal `<background>` va invece tolto l'inset che
+`capacitor-assets` scrive, se no resta un alone al bordo della maschera — e va
+ripatchato **dopo** ogni `capacitor-assets generate`.
+
 ## Cose ancora da fare
 
-- APK / GitHub Pages: non ancora fatti, l'app gira solo in locale
 - niente suoni
-- pensato per il PC: sul telefono l'anteprima al passaggio del mouse non esiste,
-  e le celle vanno verificate sui 384 px reali del Galaxy A25
+- il verdetto finale sui 384 px reali del Galaxy A25 lo da' il telefono: il banco
+  di prova qui e' un Pixel 6 emulato
