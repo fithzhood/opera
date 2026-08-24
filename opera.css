@@ -326,7 +326,17 @@ body {
 
 /* ---------- schermo basso e largo (telefono coricato): comandi in colonna a lato,
      cosi' tutta l'altezza resta al quadro e i quadretti restano toccabili ---------- */
+/* Nell'APK, quando la pagina copre tutto lo schermo, nessuno ha tolto lo spazio
+   del foro della fotocamera: lo teniamo noi sul bordo corto. */
+body.capacitor.senza-riparo { --sa-t: max(env(safe-area-inset-top, 0px), 34px); }
+
 @media (orientation: landscape) and (max-height: 620px) {
+  /* coricati il foro sta di lato, non piu' in cima */
+  body.capacitor.senza-riparo {
+    --sa-t: env(safe-area-inset-top, 0px);
+    --sa-l: max(env(safe-area-inset-left, 0px), 34px);
+    --sa-r: max(env(safe-area-inset-right, 0px), 34px);
+  }
   #app {
     display: grid;
     grid-template-columns: 138px minmax(0, 1fr);
