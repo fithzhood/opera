@@ -11,8 +11,15 @@
      leggere la griglia e la velatura della sagoma d'arrivo, e si vede quando ci
      si sta appoggiando sopra. Il contorno invece e' pieno e marcato. */
   --figure:     rgba(176, 55, 41, .88);
+  --figure-ok:  rgba(56, 124, 76, .94);   /* figura tutta dentro la sagoma */
   --figure-hi:  #c85a45;
-  --figure-ink: #571209;
+  --figure-ink: #4a1a10;
+
+  /* zone da lasciare libere: foro della fotocamera, angoli arrotondati, barre */
+  --sa-t: env(safe-area-inset-top, 0px);
+  --sa-r: env(safe-area-inset-right, 0px);
+  --sa-b: env(safe-area-inset-bottom, 0px);
+  --sa-l: env(safe-area-inset-left, 0px);
   --gold:       #d3a34a;
   --gold-soft:  #8a6a26;
   --text:       #e6e1d6;
@@ -45,7 +52,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 14px 18px 18px;
+  padding: calc(14px + var(--sa-t)) calc(18px + var(--sa-r))
+           calc(18px + var(--sa-b)) calc(18px + var(--sa-l));
   gap: 10px;
 }
 
@@ -155,12 +163,12 @@ body {
 
 #figure { position: absolute; inset: 0; will-change: transform; }
 #figure svg { position: absolute; inset: 0; overflow: visible; }
-.fig-body { fill: var(--figure); }
+.fig-body { fill: var(--figure); transition: fill .3s; }
 .fig-edge { fill: none; stroke: var(--figure-ink); stroke-width: 4; stroke-linejoin: round; }
 .fig-seam { stroke: rgba(255,255,255,.20); stroke-width: 1.5; }
 .fig-sheen { fill: rgba(255,255,255,.07); }
-#figure.won .fig-body { fill: var(--gold); transition: fill .35s; }
-#figure.won .fig-edge { stroke: #6b4f13; transition: stroke .35s; }
+#figure.won .fig-body { fill: var(--figure-ok); }
+#figure.won .fig-edge { stroke: #123024; transition: stroke .3s; }
 #figureLayer.shake { animation: shake .3s; }
 @keyframes shake {
   0%,100% { }
@@ -227,6 +235,10 @@ body {
 /* piano 4: sagoma d'arrivo e anteprima */
 
 #marks svg { position: absolute; inset: 0; overflow: visible; }
+.target-halo {
+  fill: none; stroke: rgba(252,248,238,.92); stroke-width: 7;
+  stroke-dasharray: 9 7; stroke-linejoin: round; stroke-linecap: round;
+}
 .target-edge {
   fill: none; stroke: #6f5312; stroke-width: 3;
   stroke-dasharray: 9 7; stroke-linejoin: round;
@@ -308,7 +320,8 @@ body {
   #brand { order: -1; flex: 0 0 100%; font-size: 21px; }
   #score { margin-left: auto; }
   .pill { min-width: 54px; padding: 4px 8px; }
-  #app { padding: 10px 10px 14px; }
+  #app { padding: calc(10px + var(--sa-t)) calc(10px + var(--sa-r))
+                 calc(14px + var(--sa-b)) calc(10px + var(--sa-l)); }
 }
 
 /* ---------- schermo basso e largo (telefono coricato): comandi in colonna a lato,
@@ -319,7 +332,9 @@ body {
     grid-template-columns: 138px minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr);
     grid-template-areas: "head stage" "tools stage";
-    padding: 8px; gap: 8px;
+    padding: calc(8px + var(--sa-t)) calc(8px + var(--sa-r))
+             calc(8px + var(--sa-b)) calc(8px + var(--sa-l));
+    gap: 8px;
     align-items: stretch;
   }
   #top {

@@ -152,27 +152,49 @@
     return [S.level.cols * cell, S.level.rows * cell, cell];
   }
 
+  /* Un solo tracciato con un rettangolo per cella. Serve che sia UNO: cosi' il
+     disegnatore lo riempie come una figura sola e fra caselle vicine non resta
+     nessun filo chiaro, nemmeno mentre la figura ruota. Il contorno unito non
+     va bene qui, perche' i quadretti verdi possono toccarsi solo d'angolo e il
+     tracciamento degli anelli si romperebbe. */
+  function cellsPath(cells, cell) {
+    var out = '', i, x, y;
+    for (i = 0; i < cells.length; i++) {
+      x = f(cells[i][0] * cell); y = f(cells[i][1] * cell);
+      out += 'M' + x + ' ' + y + 'h' + f(cell) + 'v' + f(cell) + 'h' + f(-cell) + 'Z';
+    }
+    return out;
+  }
+
+  /* La figura e' rossa mentre la si muove e diventa verde solo quando e' tutta
+     dentro la sagoma: il verde vale "a posto", non "a meta' strada". Il colore
+     lo decide la classe .won sul contenitore, che sopravvive al ridisegno. */
   function drawFigure() {
     var b = boardSize(), w = b[0], h = b[1], cell = b[2];
-    var d = ringsPath(C.outline(S.cells), cell);
     $('figure').innerHTML =
       '<svg width="' + w + '" height="' + h + '" xmlns="http://www.w3.org/2000/svg">' +
-        '<path class="fig-body" d="' + d + '"/>' +
+        '<path class="fig-body" d="' + cellsPath(S.cells, cell) + '"/>' +
         '<path class="fig-seam" d="' + seamsPath(S.cells, cell) + '" fill="none"/>' +
-        '<path class="fig-edge" d="' + d + '"/>' +
+        '<path class="fig-edge" d="' + ringsPath(C.outline(S.cells), cell) + '"/>' +
       '</svg>';
   }
 
   function drawMarks() {
     var b = boardSize(), w = b[0], h = b[1], cell = b[2];
-    var parts = '<path class="target-edge" d="' + ringsPath(C.outline(S.level.target), cell) + '"/>';
+    var dt = ringsPath(C.outline(S.level.target), cell);
+    /* due passate: un alone chiaro sotto e le trattine scure sopra. Senza alone
+       il tratteggio sparisce dove la figura e' gia' appoggiata sulla sagoma. */
+    var parts = '<path class="target-halo" d="' + dt + '"/>' +
+                '<path class="target-edge" d="' + dt + '"/>';
     if (S.ghost) {
       if (S.ghost.axis !== undefined) {
         var ang = AXIS_ANGLE[S.ghost.axis] * Math.PI / 180;
         var cx = (S.ghost.pivot[0] + .5) * cell, cy = (S.ghost.pivot[1] + .5) * cell;
         var L = (w + h);
-        parts += '<line class="target-edge" x1="' + f(cx - Math.cos(ang) * L) + '" y1="' + f(cy - Math.sin(ang) * L) +
-                 '" x2="' + f(cx + Math.cos(ang) * L) + '" y2="' + f(cy + Math.sin(ang) * L) + '"/>';
+        var x1 = f(cx - Math.cos(ang) * L), y1 = f(cy - Math.sin(ang) * L);
+        var x2 = f(cx + Math.cos(ang) * L), y2 = f(cy + Math.sin(ang) * L);
+        parts += '<line class="target-halo" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"/>' +
+                 '<line class="target-edge" x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '"/>';
       }
       if (S.ghost.pivot && S.ghost.axis === undefined && S.ghost.spin)
         parts += '<circle class="pivot-dot" cx="' + f((S.ghost.pivot[0] + .5) * cell) +
