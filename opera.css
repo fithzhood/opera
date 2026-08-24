@@ -300,7 +300,45 @@ body {
 
 @media (max-width: 700px) {
   #top { flex-wrap: wrap; gap: 8px; }
-  #brand { order: -1; width: 100%; font-size: 21px; }
+  /* flex:1 azzera il flex-basis, quindi il titolo va tenuto giu' con la base al 100%
+     o finisce sulla stessa riga del pulsante dei quadri */
+  #brand { order: -1; flex: 0 0 100%; font-size: 21px; }
+  #score { margin-left: auto; }
   .pill { min-width: 54px; padding: 4px 8px; }
   #app { padding: 10px 10px 14px; }
+}
+
+/* ---------- schermo basso e largo (telefono coricato): comandi in colonna a lato,
+     cosi' tutta l'altezza resta al quadro e i quadretti restano toccabili ---------- */
+@media (orientation: landscape) and (max-height: 620px) {
+  #app {
+    display: grid;
+    grid-template-columns: 138px minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    grid-template-areas: "head stage" "tools stage";
+    padding: 8px; gap: 8px;
+    align-items: stretch;
+  }
+  #top {
+    grid-area: head;
+    flex-direction: column; align-items: stretch;
+    width: auto; max-width: none; gap: 5px;
+  }
+  #brand { order: -2; flex: 0 0 auto; width: auto; font-size: 16px; letter-spacing: .12em; }
+  #levelName { order: -1; font-size: 13px; text-align: center; }
+  #btnLevels { order: 1; }
+  #score { flex-direction: column; gap: 4px; }
+  .pill { flex-direction: row; justify-content: space-between; align-items: baseline; min-width: 0; padding: 2px 8px; }
+  .pill span { font-size: 9px; }
+  .pill b { font-size: 14px; }
+  #tools {
+    grid-area: tools;
+    flex-direction: column; align-items: stretch; align-content: start;
+    flex-wrap: nowrap; gap: 5px; overflow-y: auto;
+  }
+  #tools .tool { padding: 6px 8px; font-size: 12px; }
+  #hint { font-size: 11px; text-align: left; min-height: 0; margin-top: 4px; max-width: none; }
+  #stage { grid-area: stage; gap: 0; }
+  .sheet { padding: 16px 18px; max-height: 92vh; }
+  #pickerGrid { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
 }

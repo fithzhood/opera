@@ -226,17 +226,41 @@
 
   /* ================= impaginazione ================= */
 
+  /* Col telefono coricato il nome del quadro e il suggerimento si spostano nella
+     colonna di lato, cosi' l'altezza resta tutta al quadro. */
+  function placeChrome(rail) {
+    var name = $('levelName'), hint = $('hint'), top = $('top'), stage = $('stage'), tools = $('tools');
+    if (rail) {
+      if (name.parentNode !== top) top.appendChild(name);
+      if (hint.parentNode !== tools) tools.appendChild(hint);
+    } else {
+      if (name.parentNode !== stage) stage.insertBefore(name, stage.firstChild);
+      if (hint.parentNode !== stage) stage.appendChild(hint);
+    }
+  }
+
+  /* Il lato della cella non si indovina con numeri fissi: si rimpicciolisce il
+     quadro a nulla, si misura lo spazio che resta davvero, e si ricalcola. */
   function layout() {
     if (!S.level) return;
-    var lv = S.level;
-    var availW = Math.min(window.innerWidth - 36, 920);
-    var availH = window.innerHeight - 250;
-    var cell = Math.floor(Math.min(availW / lv.cols, availH / lv.rows));
-    cell = Math.max(32, Math.min(88, cell));
-    var root = document.documentElement.style;
-    root.setProperty('--cell', cell + 'px');
+    var lv = S.level, root = document.documentElement.style;
     root.setProperty('--cols', lv.cols);
     root.setProperty('--rows', lv.rows);
+
+    placeChrome(window.matchMedia('(orientation: landscape) and (max-height: 620px)').matches);
+
+    root.setProperty('--cell', '1px');
+    var stage = $('stage'), box = stage.getBoundingClientRect();
+    var used = 0, kids = stage.children;
+    for (var i = 0; i < kids.length; i++)
+      if (kids[i].id !== 'boardWrap') used += kids[i].getBoundingClientRect().height;
+    var gaps = (kids.length - 1) * (parseFloat(getComputedStyle(stage).rowGap) || 0);
+
+    var availW = box.width - 4;
+    var availH = box.height - used - gaps - 4;
+    var cell = Math.floor(Math.min(availW / lv.cols, availH / lv.rows));
+    cell = Math.max(22, Math.min(88, cell));
+    root.setProperty('--cell', cell + 'px');
   }
 
   function render() {
@@ -529,7 +553,9 @@
       if (k === 'h') hint();
     });
 
-    window.addEventListener('resize', function () { layout(); render(); });
+    var relayout = function () { layout(); render(); };
+    window.addEventListener('resize', relayout);
+    window.addEventListener('orientationchange', function () { setTimeout(relayout, 120); });
 
     setupNative();
     loadLevel(typeof store.last === 'number' ? store.last : 0);
