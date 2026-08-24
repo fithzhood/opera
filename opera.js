@@ -359,9 +359,11 @@
       S.history.push(S.cells);
       S.cells = res;
       S.moves++;
+      /* il flag va spento PRIMA di ridisegnare: render() decide da qui se
+         annulla e ricomincia sono attivi, e nessuno lo richiama dopo */
+      S.busy = false;
       render();
       void fig.offsetWidth;
-      S.busy = false;
       afterMove();
     });
   }
