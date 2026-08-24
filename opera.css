@@ -363,6 +363,7 @@ body {
   white-space: nowrap;
 }
 .act-count i { color: var(--gold); font-style: normal; margin: 0 3px; }
+.act-count b { font-weight: 400; color: var(--paper-dim); }
 .act-locked .act-n { color: #4b5666; }
 .act-done .act-count { color: var(--gold); }
 
@@ -374,18 +375,26 @@ body {
 
 /* ---- un quadro ---- */
 
+/* Aperto e da aprire devono distinguersi da lontano, non a forza di guardare:
+   il quadro aperto e' un riquadro rilevato e illuminato, quello da aprire e'
+   quasi trasparente sul fondo, senza nome e senza sagoma. */
 .lv {
   position: relative;
   display: flex; flex-direction: column; gap: 5px;
   text-align: left; font: inherit;
-  background: linear-gradient(180deg, #161d27, #121821);
+  background: linear-gradient(180deg, #1f2937, #161f2b);
   color: var(--text);
-  border: 1px solid var(--ink-line); border-radius: 10px;
+  border: 1px solid #43536a; border-radius: 10px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 2px 6px rgba(0,0,0,.35);
   padding: 9px 10px 8px;
   cursor: pointer;
-  transition: border-color .15s, background .15s, transform .12s;
+  transition: border-color .15s, background .15s, transform .12s, box-shadow .15s;
 }
-.lv:hover { background: linear-gradient(180deg, #1d2733, #161d28); border-color: #46566b; transform: translateY(-1px); }
+.lv:hover {
+  background: linear-gradient(180deg, #283548, #1d2735);
+  border-color: #6a809b; transform: translateY(-1px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.09), 0 6px 14px rgba(0,0,0,.45);
+}
 .lv:active { transform: translateY(0); }
 
 .lv-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
@@ -405,7 +414,10 @@ body {
 .lv .stelle i { color: #46505f; font-style: normal; }
 .lv .st .mosse { color: var(--text-dim); margin-left: 4px; }
 
-.lv.done { border-color: #33404f; }
+/* i chiusi non devono spegnersi: restano riquadri accesi, con il bordo
+   che vira al verde (e all'oro se presi nel minimo) */
+.lv.done { border-color: #4d6a58; }
+.lv.perfect { border-color: #7a6634; }
 .lv.done .st { color: #82a382; }
 .lv.perfect .st { color: var(--gold); }
 .lv.perfect .mini path { fill: var(--figure-ok); }
@@ -423,12 +435,18 @@ body {
 /* da aprire: niente nome, solo il numero e il lucchetto */
 .lv.locked {
   cursor: default;
-  background: #10151d;
-  border-style: dashed; border-color: #232c39;
+  background: transparent;
+  border: 1px dashed #212a36;
+  box-shadow: none;
   color: var(--text-dim);
+  opacity: .42;
 }
-.lv.locked .lock { width: 16px; height: 16px; display: block; fill: #46505f; stroke: #46505f; }
-.lv.locked .st { color: #4b5666; }
+.lv.locked .num { color: #3f4959; }
+.lv.locked .lock { width: 15px; height: 15px; display: block; fill: #3f4959; stroke: #3f4959; }
+.lv.locked .st { color: #56627a; }
+/* il primo che si aprira': si fa notare appena, cosi' si vede dove si arriva */
+.lv.locked.vicino { opacity: .62; border-color: #33404f; }
+.lv.locked.vicino .st { color: var(--gold-soft); }
 
 #menuFoot { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
 

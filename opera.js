@@ -589,9 +589,12 @@
   function tile(i, prossimo, totale) {
     var lv = LEVELS[i], best = store.best[lv.id], n = stelleDi(i);
     if (!aperto(i, totale)) {
-      return '<div class="lv locked" aria-disabled="true">' +
+      /* quante ne mancano dice quanto e' vicino; la soglia secca no */
+      var mancano = soglia(i) - totale;
+      var vicino = mancano <= 3 ? ' vicino' : '';
+      return '<div class="lv locked' + vicino + '" aria-disabled="true">' +
                '<span class="lv-top"><span class="num">' + lv.n + '</span>' + LUCCHETTO + '</span>' +
-               '<span class="st">servono ' + soglia(i) + ' ★</span>' +
+               '<span class="st">ancora ' + mancano + ' ★</span>' +
              '</div>';
     }
     var cls = 'lv';
@@ -616,14 +619,15 @@
 
     var html = '';
     for (var a = 0; a < ACTS.length; a++) {
-      var atto = ACTS[a], dentro = [], chiuse = 0, stelleAtto = 0, qualcunoAperto = false, primoDentro = -1;
+      var atto = ACTS[a], dentro = [], chiuse = 0, stelleAtto = 0, apertiAtto = 0, primoDentro = -1;
       for (i = 0; i < LEVELS.length; i++) if (LEVELS[i].act === atto.n) {
         if (primoDentro < 0) primoDentro = i;
         dentro.push(i);
         if (risolto(i)) chiuse++;
         stelleAtto += stelleDi(i);
-        if (aperto(i, totale)) qualcunoAperto = true;
+        if (aperto(i, totale)) apertiAtto++;
       }
+      var qualcunoAperto = apertiAtto > 0;
       if (!dentro.length) continue;
 
       var testa = qualcunoAperto
@@ -637,7 +641,10 @@
                 '<header class="act-head">' +
                   '<span class="act-n">' + (ROMANI[atto.n] || atto.n) + '</span>' +
                   '<span class="act-txt">' + testa + '</span>' +
-                  '<span class="act-count">' + stelleAtto + '/' + dentro.length * 3 + '<i>★</i></span>' +
+                  '<span class="act-count">' +
+                    (apertiAtto && apertiAtto < dentro.length
+                      ? '<b>' + apertiAtto + ' di ' + dentro.length + ' aperti</b> · ' : '') +
+                    stelleAtto + '/' + dentro.length * 3 + '<i>★</i></span>' +
                 '</header><div class="act-grid">';
       for (i = 0; i < dentro.length; i++) html += tile(dentro[i], prossimo, totale);
       html += '</div></section>';
