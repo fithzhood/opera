@@ -409,17 +409,34 @@
 
   function say(t) { $('hint').textContent = t || ''; }
 
+  /* quante stelle vale una chiusura in n mosse */
+  function stellePer(n, par) { return n <= par ? 3 : n <= par + 2 ? 2 : 1; }
+
   function win() {
     $('figure').classList.add('won');
-    var id = S.level.id, prev = store.best[id];
-    if (prev === undefined || S.moves < prev) { store.best[id] = S.moves; saveStore(); }
-    var perfect = S.moves === S.level.par;
+    var lv = S.level, prima = store.best[lv.id];
+    var stellePrima = prima === undefined ? 0 : stellePer(prima, lv.par);
+    var record = prima === undefined || S.moves < prima;
+    if (record) { store.best[lv.id] = S.moves; saveStore(); }
+    var n = stellePer(Math.min(S.moves, prima === undefined ? S.moves : prima), lv.par);
+    var guadagnate = n - stellePrima;
+
     setTimeout(function () {
-      $('winTitle').textContent = perfect ? 'Perfetto' : 'Risolto';
-      $('winLine').textContent = perfect
-        ? 'Hai chiuso il quadro nel minimo possibile: ' + S.moves + ' mosse.'
-        : 'Risolto in ' + S.moves + ' mosse. Il minimo è ' + S.level.par + '.';
-      $('btnNext').textContent = S.idx < LEVELS.length - 1 ? 'Quadro seguente' : 'Torna ai quadri';
+      $('winTitle').innerHTML = (S.moves === lv.par ? 'Perfetto ' : 'Risolto ') + stelleHtml(n);
+      var riga = S.moves === lv.par
+        ? 'Chiuso nel minimo possibile: ' + S.moves + ' mosse.'
+        : 'Chiuso in ' + S.moves + ' mosse. Il minimo è ' + lv.par + '.';
+      if (guadagnate > 0)
+        riga += ' Hai guadagnato ' + (guadagnate === 1 ? 'una stella' : guadagnate + ' stelle') +
+                ': ora ne hai ' + stelleTotali() + '.';
+      else if (!record && prima !== undefined)
+        riga += ' Il tuo record resta ' + prima + '.';
+      $('winLine').textContent = riga;
+
+      var seguente = S.idx + 1;
+      var puoi = seguente < LEVELS.length && aperto(seguente);
+      $('btnNext').textContent = puoi ? 'Quadro seguente' : 'Ai quadri';
+      $('btnNext').dataset.vai = puoi ? seguente : -1;
       open$('win');
     }, 620);
   }
@@ -502,16 +519,47 @@
   function open$(id) { $(id).classList.add('open'); }
   function close$(id) { $(id).classList.remove('open'); }
 
-  /* ================= menu e sblocco dei quadri ================= */
+  /* ================= stelle e apertura dei quadri ================= */
+
+  /* Ogni quadro chiuso vale da una a tre stelle. Per entrare in un quadro serve
+     un totale di stelle, non l'aver chiuso quello prima: cosi' un quadro che
+     non viene non blocca la strada. La soglia cresce piu' piano dei quadri
+     (tre quarti), quindi chi raccoglie anche una sola stella per quadro va
+     sempre avanti, e chi ne prende tre puo' saltare avanti parecchio. */
+  var SOGLIA = 0.75;
 
   function risolto(i) { return store.best[LEVELS[i].id] !== undefined; }
 
-  /* il primo e' sempre aperto, gli altri si aprono chiudendo il precedente */
-  function aperto(i) { return i === 0 || risolto(i - 1); }
+  function stelleDi(i) {
+    var lv = LEVELS[i], best = store.best[lv.id];
+    if (best === undefined) return 0;
+    if (best <= lv.par) return 3;          /* nel minimo di mosse */
+    if (best <= lv.par + 2) return 2;
+    return 1;
+  }
+
+  function stelleTotali() {
+    var t = 0;
+    for (var i = 0; i < LEVELS.length; i++) t += stelleDi(i);
+    return t;
+  }
+
+  function soglia(i) { return Math.round(i * SOGLIA); }
+
+  function aperto(i, totale) {
+    return (totale === undefined ? stelleTotali() : totale) >= soglia(i);
+  }
 
   function primoDaFare() {
-    for (var i = 0; i < LEVELS.length; i++) if (!risolto(i)) return i;
-    return LEVELS.length - 1;
+    var tot = stelleTotali(), i;
+    for (i = 0; i < LEVELS.length; i++) if (aperto(i, tot) && !risolto(i)) return i;
+    for (i = 0; i < LEVELS.length; i++) if (!risolto(i)) return i;
+    return 0;
+  }
+
+  function stelleHtml(n) {
+    return '<em class="stelle">' + new Array(n + 1).join('★') +
+           '<i>' + new Array(4 - n).join('☆') + '</i></em>';
   }
 
   var LUCCHETTO =
@@ -538,20 +586,20 @@
              '<path d="' + d + '"/></svg>';
   }
 
-  function tile(i, prossimo) {
-    var lv = LEVELS[i], best = store.best[lv.id];
-    if (!aperto(i)) {
+  function tile(i, prossimo, totale) {
+    var lv = LEVELS[i], best = store.best[lv.id], n = stelleDi(i);
+    if (!aperto(i, totale)) {
       return '<div class="lv locked" aria-disabled="true">' +
                '<span class="lv-top"><span class="num">' + lv.n + '</span>' + LUCCHETTO + '</span>' +
-               '<span class="st">da aprire</span>' +
+               '<span class="st">servono ' + soglia(i) + ' ★</span>' +
              '</div>';
     }
     var cls = 'lv';
-    if (best !== undefined) cls += best <= lv.par ? ' done perfect' : ' done';
+    if (best !== undefined) cls += n === 3 ? ' done perfect' : ' done';
     if (i === prossimo) cls += ' next';
     var st = best === undefined
       ? (i === prossimo ? '<em class="ora">da fare</em> · minimo ' + lv.par : 'minimo ' + lv.par)
-      : best + ' / ' + lv.par + (best <= lv.par ? ' <em>✦</em>' : ' <em>✓</em>');
+      : stelleHtml(n) + ' <span class="mosse">' + best + '/' + lv.par + '</span>';
     return '<button class="' + cls + '" data-lv="' + i + '">' +
              '<span class="lv-top"><span class="num">' + lv.n + '</span>' +
                miniShape(lv.shape) + '</span>' +
@@ -561,50 +609,53 @@
   }
 
   function buildMenu() {
+    var totale = stelleTotali(), massimo = LEVELS.length * 3;
     var fatti = 0, i;
     for (i = 0; i < LEVELS.length; i++) if (risolto(i)) fatti++;
     var prossimo = primoDaFare();
-    var tutti = fatti === LEVELS.length;
 
     var html = '';
     for (var a = 0; a < ACTS.length; a++) {
-      var atto = ACTS[a], dentro = [], chiusi = 0, qualcunoAperto = false;
+      var atto = ACTS[a], dentro = [], chiuse = 0, stelleAtto = 0, qualcunoAperto = false, primoDentro = -1;
       for (i = 0; i < LEVELS.length; i++) if (LEVELS[i].act === atto.n) {
+        if (primoDentro < 0) primoDentro = i;
         dentro.push(i);
-        if (risolto(i)) chiusi++;
-        if (aperto(i)) qualcunoAperto = true;
+        if (risolto(i)) chiuse++;
+        stelleAtto += stelleDi(i);
+        if (aperto(i, totale)) qualcunoAperto = true;
       }
       if (!dentro.length) continue;
 
       var testa = qualcunoAperto
         ? '<span class="act-t">' + atto.title + '</span>' +
           '<span class="act-note">' + atto.note + '</span>'
-        : '<span class="act-t da-scoprire">Da scoprire</span>';
+        : '<span class="act-t da-scoprire">Da scoprire</span>' +
+          '<span class="act-note">Si apre con ' + soglia(primoDentro) + ' stelle.</span>';
 
       html += '<section class="act' + (qualcunoAperto ? '' : ' act-locked') +
-                (chiusi === dentro.length ? ' act-done' : '') + '">' +
+                (chiuse === dentro.length ? ' act-done' : '') + '">' +
                 '<header class="act-head">' +
                   '<span class="act-n">' + (ROMANI[atto.n] || atto.n) + '</span>' +
                   '<span class="act-txt">' + testa + '</span>' +
-                  '<span class="act-count">' + chiusi + '/' + dentro.length + '</span>' +
+                  '<span class="act-count">' + stelleAtto + '/' + dentro.length * 3 + '<i>★</i></span>' +
                 '</header><div class="act-grid">';
-      for (i = 0; i < dentro.length; i++) html += tile(dentro[i], prossimo);
+      for (i = 0; i < dentro.length; i++) html += tile(dentro[i], prossimo, totale);
       html += '</div></section>';
     }
     $('pickerGrid').innerHTML = html;
 
-    $('menuLine').textContent = tutti
-      ? 'Chiusi tutti e ' + LEVELS.length + ' i quadri. Si può sempre rigiocarli.'
-      : fatti === 0
-        ? LEVELS.length + ' quadri in ' + ACTS.length + ' atti. Se ne apre uno chiudendo quello prima.'
-        : fatti + ' quadri chiusi su ' + LEVELS.length + '.';
-    $('menuBar').firstChild.style.width = Math.round(fatti / LEVELS.length * 100) + '%';
+    $('menuLine').innerHTML =
+      '<b class="conta">' + totale + '</b><span class="astro">★</span>' +
+      '<span class="su">su ' + massimo + '</span>' +
+      '<span class="sep">·</span>' + fatti + ' quadri chiusi su ' + LEVELS.length;
+    $('menuBar').firstChild.style.width = Math.round(totale / massimo * 100) + '%';
+
+    var tutti = fatti === LEVELS.length;
     $('btnPlay').textContent = tutti
       ? 'Rigioca il primo'
       : fatti === 0 ? 'Comincia' : 'Riprendi dal quadro ' + LEVELS[prossimo].n;
     $('btnPlay').dataset.lv = tutti ? 0 : prossimo;
 
-    /* il quadro da fare va portato sotto gli occhi */
     var segno = $('pickerGrid').querySelector('.lv.next');
     if (segno) setTimeout(function () {
       var g = $('pickerGrid');
@@ -669,10 +720,11 @@
     $('btnRulesMenu').onclick = function () { open$('howto'); };
 
     $('btnAgain').onclick = function () { close$('win'); reset(); };
+    $('btnMenuWin').onclick = function () { close$('win'); showMenu(); };
     $('btnNext').onclick = function () {
       close$('win');
-      if (S.idx < LEVELS.length - 1) loadLevel(S.idx + 1);
-      else showMenu();
+      var vai = +($('btnNext').dataset.vai);
+      if (vai >= 0) loadLevel(vai); else showMenu();
     };
     $('btnRules').onclick = function () { open$('howto'); };
     $('btnCloseHowto').onclick = function () {

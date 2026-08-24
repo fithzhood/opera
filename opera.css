@@ -280,6 +280,8 @@ body {
   box-shadow: 0 24px 60px rgba(0,0,0,.6);
 }
 .sheet.narrow { max-width: 440px; }
+.sheet h2 .stelle { color: var(--gold); letter-spacing: .08em; margin-left: 6px; }
+.sheet h2 .stelle i { color: #4b5666; font-style: normal; }
 .sheet h2 {
   margin: 0 0 14px;
   font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
@@ -306,7 +308,16 @@ body {
 #app.in-menu #btnLevels { display: none; }
 
 #menuHead { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 8px; }
-#menuLine { margin: 0; font-size: 13px; color: var(--text-dim); text-align: center; }
+#menuLine {
+  margin: 0; font-size: 13px; color: var(--text-dim); text-align: center;
+  display: flex; align-items: baseline; justify-content: center; gap: 5px;
+}
+#menuLine .conta {
+  font-size: 19px; color: var(--paper); font-variant-numeric: tabular-nums;
+}
+#menuLine .astro { color: var(--gold); font-size: 14px; }
+#menuLine .su { font-size: 12px; }
+#menuLine .sep { opacity: .5; }
 #menuBar {
   height: 3px; border-radius: 3px; overflow: hidden;
   background: rgba(255,255,255,.07);
@@ -349,7 +360,9 @@ body {
 .act-count {
   font-size: 11px; color: var(--text-dim);
   font-variant-numeric: tabular-nums; letter-spacing: .06em;
+  white-space: nowrap;
 }
+.act-count i { color: var(--gold); font-style: normal; margin: 0 3px; }
 .act-locked .act-n { color: #4b5666; }
 .act-done .act-count { color: var(--gold); }
 
@@ -388,6 +401,9 @@ body {
   font-variant-numeric: tabular-nums;
 }
 .lv .st em { font-style: normal; }
+.lv .stelle { color: var(--gold); letter-spacing: .06em; }
+.lv .stelle i { color: #46505f; font-style: normal; }
+.lv .st .mosse { color: var(--text-dim); margin-left: 4px; }
 
 .lv.done { border-color: #33404f; }
 .lv.done .st { color: #82a382; }

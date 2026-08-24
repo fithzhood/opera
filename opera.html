@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta name="description" content="Rompicapo di traslazioni, rotazioni e simmetrie su griglia quadrata.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%224%22%20fill%3D%22%23e9e3d5%22/%3E%3Cpath%20d%3D%22M5%205h13v9h9v13H14v-9H5z%22%20fill%3D%22%23b03729%22/%3E%3C/svg%3E">
-<link rel="stylesheet" href="opera.css?v=14">
+<link rel="stylesheet" href="opera.css?v=15">
 </head>
 <body>
 
@@ -67,6 +67,7 @@
     <p id="winLine"></p>
     <div class="sheet-foot center">
       <button class="tool" id="btnAgain">Rigioca</button>
+      <button class="tool" id="btnMenuWin">Ai quadri</button>
       <button class="tool primary" id="btnNext">Quadro seguente</button>
     </div>
   </div>
@@ -83,6 +84,7 @@
       <li>L'<b>asse tratteggiato</b> ribalta la figura; l'asse passa per il quadretto premuto e può essere anche obliquo.</li>
       <li>Le caselle scure sono <b>muri</b>: la figura non ci finisce sopra, e non ci passa nemmeno attraverso — nemmeno girando.</li>
       <li>Una mossa che porterebbe la figura fuori dal quadro non si può fare.</li>
+      <li>Chiudere un quadro dà da una a tre <b>stelle</b>: tre se ci riesci nel minimo di mosse. Le stelle aprono i quadri seguenti, così un quadro che non viene non ti blocca la strada.</li>
     </ul>
     <div class="sheet-foot center">
       <button class="tool primary" id="btnCloseHowto">Ho capito</button>
@@ -90,8 +92,8 @@
   </div>
 </div>
 
-<script src="opera-core.js?v=14"></script>
-<script src="opera-levels.js?v=14"></script>
-<script src="opera.js?v=14"></script>
+<script src="opera-core.js?v=15"></script>
+<script src="opera-levels.js?v=15"></script>
+<script src="opera.js?v=15"></script>
 </body>
 </html>

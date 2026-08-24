@@ -78,37 +78,60 @@ normale. È stato valutato e scartato: si è scelto di restare a multipli di 90�
 
 ## Gli atti e la curva
 
-I quadri sono **44 divisi in 8 atti**, e ogni atto porta **una novita' sola**:
-punte, quarto di giro, assi dritti, assi obliqui, mezzo giro, muri, passi
-obliqui, e infine tutto insieme. La regola di progetto: la novita' si presenta
-su un quadro *facile* (griglia piccola, figura piccola, par basso) e poi ha
-quattro o cinque quadri per sedimentare prima che ne arrivi un'altra.
+**80 quadri in 8 atti, dieci per atto.** Ogni atto e' *dedicato* a una
+meccanica: punte, quarto di giro, assi dritti, assi obliqui, mezzo giro, muri,
+passi obliqui, e infine tutto insieme. La tavolozza di un atto e' fatta in gran
+parte della sua meccanica (dal 59% al 100% dei pulsanti, di solito 70–85%) e le
+meccaniche gia' viste restano **sparse qua e la'** — nel generatore e' il
+parametro `pMain`, la probabilita' di pescare un pulsante dalla novita'
+invece che dal repertorio vecchio.
 
-Per questo il par **scende all'inizio di ogni atto** e poi risale:
+Dentro l'atto la novita' si presenta sui primi due quadri con una tavolozza
+quasi pura, e poi ha otto quadri per sedimentare mentre figura e griglia
+crescono. Il par sale di uno ogni due quadri e **riparte in basso a ogni atto**:
 
 ```
-atto 1  4 4 5 5 6
-atto 2  5 6 6 6 7
-atto 3  5 6 7 7 7 8
-atto 4  5 6 7 8 8 8
-atto 5  5 7 8 8 9
-atto 6  6 7 8 9 10
-atto 7  6 8 9 10 10
-atto 8  11 11 11 12 12 13 14
+atto 1   3 4 4 5 5 6 6 7 7 8        atto 5   5 6 7 7 8 8 9 9 10 10
+atto 2   4 5 5 6 6 7 7 8 8 9        atto 6   5 5 7 7 8 9 9 10 10 11
+atto 3   5 5 5 6 7 7 8 8 9 9        atto 7   6 6 7 7 8 8 9 10 9 11
+atto 4   5 6 6 7 7 8 8 9 9 10       atto 8   10 10 11 11 12 12 13 13 14 14
 ```
 
-Gli atti stanno in `OPERA_ACTS`, e ogni livello porta il campo `act`.
+### Ottanta quadri non si tarano a mano
 
-### Un passo obliquo non puo' essere indispensabile
+Il generatore ha una **scala di cessioni**: se una specifica non produce
+niente, allenta un vincolo alla volta (par piu' basso, meno scelte richieste,
+meno posizioni, piu' meccaniche vecchie, muri meno esigenti, novita' non
+obbligatoria) e riprova, stampando cosa ha ceduto. Nell'ultima passata solo 9
+quadri su 80 hanno avuto bisogno di cedere qualcosa.
 
-Il generatore controlla che la mossa protagonista dell'atto sia davvero
-necessaria, togliendo quei pulsanti e verificando che il quadro diventi
-irrisolvibile. Con le **traslazioni diagonali non funziona**: un passo in
-diagonale si rifa' sempre con due passi dritti, quindi non e' mai
-indispensabile finche' i dritti ci sono. Il quadro che le introduce ha percio'
-una tavolozza di **sole frecce oblique**.
+La scala cede **verso il basso**, mai allargando il par verso l'alto: se no un
+quadro allentato diventerebbe piu' difficile di quelli dopo.
 
-## I livelli: come sono fatti
+### Se niente gira, niente puo' cambiare verso
+
+I due quadri che introducono i passi obliqui hanno una tavolozza di sole frecce
+diagonali. La ricerca non trovava niente perche' si chiedeva anche che l'arrivo
+avesse un **verso diverso** da quello di partenza: senza rotazioni ne'
+simmetrie il verso non puo' cambiare, quindi era una richiesta impossibile.
+`needTurn` ora si spegne da solo quando la tavolozza non contiene niente che
+giri o ribalti.
+
+## Le stelle
+
+Chiudere un quadro vale **da una a tre stelle**: tre nel minimo di mosse, due
+entro due mosse in piu', una comunque. Per entrare in un quadro serve un totale
+di stelle — **non** aver chiuso quello prima. Cosi' un quadro che non viene non
+blocca la strada.
+
+La soglia del quadro `i` (contando da zero) e' `round(i * 0.75)`. Cresce piu'
+piano dei quadri, quindi chi raccoglie **anche una sola stella per quadro va
+sempre avanti**, e chi ne prende tre puo' saltare avanti parecchio. L'ultimo
+quadro chiede 59 stelle sulle 240 possibili.
+
+Le stelle non si salvano: si ricavano da `store.best[id]`, che gia' c'era.
+
+## I livelli: come sono fatti## I livelli: come sono fatti
 
 Non sono scritti a mano. Uno script cerca disposizioni di pulsanti e **verifica
 ogni livello con una ricerca esaustiva in ampiezza**, quindi:
