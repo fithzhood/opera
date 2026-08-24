@@ -293,10 +293,27 @@ body {
 .sheet-foot { display: flex; gap: 8px; justify-content: space-between; }
 .sheet-foot.center { justify-content: center; }
 
+/* ---------- il menu iniziale ---------- */
+
+#menu { display: none; }
+#app.in-menu #menu {
+  display: flex; flex-direction: column; align-items: center;
+  flex: 1; min-height: 0; width: 100%; max-width: 720px; gap: 12px;
+}
+#app.in-menu #stage,
+#app.in-menu #tools,
+#app.in-menu #score,
+#app.in-menu #btnLevels { display: none; }
+
+#menuLine { margin: 0; font-size: 13px; color: var(--text-dim); text-align: center; }
+#menu #pickerGrid { flex: 1; min-height: 0; overflow-y: auto; width: 100%; padding: 2px; margin: 0; }
+#menuFoot { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+
 #pickerGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
-  gap: 8px; margin-bottom: 18px;
+  gap: 8px;
+  align-content: start;
 }
 .lv {
   text-align: left; font: inherit;
@@ -312,6 +329,19 @@ body {
 .lv .st { font-size: 11px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
 .lv.done .st { color: #7fa07f; }
 .lv.perfect .st { color: var(--gold); }
+
+/* da aprire: niente nome, solo il numero e il lucchetto */
+.lv.locked {
+  cursor: default;
+  border-style: dashed;
+  background: #11161e;
+  opacity: .55;
+}
+.lv.locked .nm { min-height: 20px; }
+.lv .lock {
+  width: 17px; height: 17px; display: block; margin-top: 2px;
+  fill: var(--text-dim); stroke: var(--text-dim);
+}
 
 @media (max-width: 700px) {
   #top { flex-wrap: wrap; gap: 8px; }
@@ -334,6 +364,16 @@ body {
 body.capacitor { --sa-t: max(env(safe-area-inset-top, 0px), 34px); }
 
 @media (orientation: landscape) and (max-height: 620px) {
+  /* nel menu si torna alla colonna: la barra di lato non serve */
+  #app.in-menu { display: flex; flex-direction: column; }
+  #app.in-menu #top {
+    grid-area: auto; flex-direction: row; align-items: center;
+    width: 100%; max-width: none; gap: 12px;
+  }
+  #app.in-menu #brand { order: 0; flex: 1; font-size: 18px; }
+  #app.in-menu #menu { max-width: none; }
+  #app.in-menu #menu #pickerGrid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+
   /* coricati il foro sta di lato, non piu' in cima */
   body.capacitor {
     --sa-t: env(safe-area-inset-top, 0px);

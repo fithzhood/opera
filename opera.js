@@ -29,7 +29,8 @@
     moves: 0,
     busy: false,
     hintIdx: -1,
-    ghost: null
+    ghost: null,
+    inMenu: true
   };
 
   /* ================= icone ================= */
@@ -264,7 +265,7 @@
   /* Il lato della cella non si indovina con numeri fissi: si rimpicciolisce il
      quadro a nulla, si misura lo spazio che resta davvero, e si ricalcola. */
   function layout() {
-    if (!S.level) return;
+    if (!S.level || S.inMenu) return;   /* nascosto: la misura darebbe zero */
     var lv = S.level, root = document.documentElement.style;
     root.setProperty('--cols', lv.cols);
     root.setProperty('--rows', lv.rows);
@@ -423,6 +424,7 @@
     S.busy = false;
     S.hintIdx = -1;
     S.ghost = null;
+    hideMenu();
     store.last = S.idx; saveStore();
     $('figure').classList.remove('won');
     $('figure').style.transition = 'none';
@@ -491,14 +493,42 @@
   function open$(id) { $(id).classList.add('open'); }
   function close$(id) { $(id).classList.remove('open'); }
 
-  function buildPicker() {
-    var html = '';
+  /* ================= menu e sblocco dei quadri ================= */
+
+  function risolto(i) { return store.best[LEVELS[i].id] !== undefined; }
+
+  /* il primo e' sempre aperto, gli altri si aprono chiudendo il precedente */
+  function aperto(i) { return i === 0 || risolto(i - 1); }
+
+  function primoDaFare() {
+    for (var i = 0; i < LEVELS.length; i++) if (!risolto(i)) return i;
+    return LEVELS.length - 1;
+  }
+
+  var LUCCHETTO =
+    '<svg class="lock" viewBox="0 0 24 24" aria-hidden="true">' +
+      '<rect x="5" y="10.5" width="14" height="10" rx="2"/>' +
+      '<path d="M8.2 10.5V7.6a3.8 3.8 0 0 1 7.6 0v2.9" fill="none" stroke-width="2"/>' +
+    '</svg>';
+
+  function buildMenu() {
+    var html = '', fatti = 0;
     for (var i = 0; i < LEVELS.length; i++) {
       var lv = LEVELS[i], best = store.best[lv.id];
+      if (best !== undefined) fatti++;
+      if (!aperto(i)) {
+        html += '<div class="lv locked" aria-disabled="true">' +
+                  '<span class="num">' + lv.n + '</span>' +
+                  '<span class="nm">' + LUCCHETTO + '</span>' +
+                  '<span class="st">da aprire</span>' +
+                '</div>';
+        continue;
+      }
       var cls = 'lv';
-      if (i === S.idx) cls += ' current';
       if (best !== undefined) cls += best <= lv.par ? ' done perfect' : ' done';
-      var st = best === undefined ? 'minimo ' + lv.par : best + ' / ' + lv.par + (best <= lv.par ? '  ✦' : '  ✓');
+      var st = best === undefined
+        ? 'minimo ' + lv.par
+        : best + ' / ' + lv.par + (best <= lv.par ? '  ✦' : '  ✓');
       html += '<button class="' + cls + '" data-lv="' + i + '">' +
                 '<span class="num">' + lv.n + '</span>' +
                 '<span class="nm">' + lv.name + '</span>' +
@@ -506,6 +536,31 @@
               '</button>';
     }
     $('pickerGrid').innerHTML = html;
+
+    var prossimo = primoDaFare();
+    var tutti = fatti === LEVELS.length;
+    $('menuLine').textContent = tutti
+      ? 'Chiusi tutti e ' + LEVELS.length + ' i quadri. Si può sempre rigiocarli.'
+      : fatti === 0
+        ? LEVELS.length + ' quadri. Se ne apre uno chiudendo quello prima.'
+        : fatti + ' quadri chiusi su ' + LEVELS.length + '.';
+    $('btnPlay').textContent = tutti
+      ? 'Rigioca il primo'
+      : fatti === 0 ? 'Comincia' : 'Riprendi dal quadro ' + LEVELS[prossimo].n;
+    $('btnPlay').dataset.lv = tutti ? 0 : prossimo;
+  }
+
+  function showMenu() {
+    if (S.busy) return;
+    S.inMenu = true;
+    buildMenu();
+    $('app').classList.add('in-menu');
+    close$('win');
+  }
+
+  function hideMenu() {
+    S.inMenu = false;
+    $('app').classList.remove('in-menu');
   }
 
   /* ================= avvio ================= */
@@ -538,24 +593,24 @@
       if (!store.preview) clearGhost();
     };
 
-    $('btnLevels').onclick = function () { buildPicker(); open$('picker'); };
-    $('btnClosePicker').onclick = function () { close$('picker'); };
-    $('picker').addEventListener('click', function (e) {
-      if (e.target === $('picker')) return close$('picker');
-      var b = e.target.closest('.lv');
-      if (b) { close$('picker'); loadLevel(+b.dataset.lv); }
+    $('btnLevels').onclick = showMenu;
+    $('btnPlay').onclick = function () { loadLevel(+$('btnPlay').dataset.lv); };
+    $('pickerGrid').addEventListener('click', function (e) {
+      var b = e.target.closest('button.lv');   /* i bloccati sono div, non pulsanti */
+      if (b) loadLevel(+b.dataset.lv);
     });
     $('btnWipe').onclick = function () {
-      if (!confirm('Cancello tutti i risultati salvati?')) return;
+      if (!confirm('Cancello tutti i risultati salvati? I quadri tornano da aprire.')) return;
       store = { best: {}, preview: store.preview };
-      saveStore(); buildPicker();
+      saveStore(); buildMenu();
     };
+    $('btnRulesMenu').onclick = function () { open$('howto'); };
 
     $('btnAgain').onclick = function () { close$('win'); reset(); };
     $('btnNext').onclick = function () {
       close$('win');
       if (S.idx < LEVELS.length - 1) loadLevel(S.idx + 1);
-      else { buildPicker(); open$('picker'); }
+      else showMenu();
     };
     $('btnRules').onclick = function () { open$('howto'); };
     $('btnCloseHowto').onclick = function () {
@@ -568,8 +623,10 @@
       if (e.key === 'Escape') {
         if ($('howto').classList.contains('open')) return $('btnCloseHowto').click();
         if ($('win').classList.contains('open')) return;
-        $('picker').classList.contains('open') ? close$('picker') : $('btnLevels').click();
+        if (!S.inMenu) showMenu();
+        return;
       }
+      if (S.inMenu) return;
       if (e.target.tagName === 'INPUT') return;
       var k = e.key.toLowerCase();
       if (k === 'z') undo();
@@ -582,7 +639,10 @@
     window.addEventListener('orientationchange', function () { setTimeout(relayout, 120); });
 
     setupNative();
-    loadLevel(typeof store.last === 'number' ? store.last : 0);
+    /* si parte sempre dal menu; il quadro si sceglie da li' */
+    S.level = LEVELS[Math.min(typeof store.last === 'number' ? store.last : 0, LEVELS.length - 1)];
+    S.cells = S.level.shape.slice();
+    showMenu();
     if (!store.seenHowto) open$('howto');
   }
 
@@ -601,8 +661,7 @@
     App.addListener('backButton', function () {
       if ($('howto').classList.contains('open')) return close$('howto');
       if ($('win').classList.contains('open')) return close$('win');
-      if ($('picker').classList.contains('open')) return close$('picker');
-      if (S.history.length) return reset();
+      if (!S.inMenu) return showMenu();
       App.exitApp();
     });
   }

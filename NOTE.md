@@ -72,6 +72,22 @@ soglie vanno quindi calibrate sulla taglia della figura, e i pulsanti devono
 essere fitti (dal 55% all'80% delle caselle). I valori attuali danno da 1,5
 scelte per posizione nei quadri col domino fino a 3,3 nei pentomini.
 
+## Il menu e lo sblocco
+
+Si parte sempre dal **menu**, non da un quadro. Il primo quadro e' aperto, ogni
+altro si apre chiudendo quello prima (`store.best[id] !== undefined`); quelli
+gia' chiusi restano aperti e si possono rigiocare quante volte si vuole, e il
+punteggio salvato e' il minimo fra i tentativi.
+
+I riquadri bloccati sono `<div>`, non `<button>`: cosi' non sono cliccabili ne'
+raggiungibili col tabulatore, e il gestore del clic filtra su `button.lv`.
+
+Mentre si sta nel menu il quadro e' nascosto, quindi `layout()` esce subito: se
+provasse a misurare troverebbe zero e calcolerebbe una cella minuscola.
+
+Nel telefono coricato il menu torna a colonna singola (la barra di comandi di
+lato serve solo mentre si gioca).
+
 ## Collaudo
 
 `opera-core.js` gira anche in Node, quindi la verifica dei livelli si fa da riga
