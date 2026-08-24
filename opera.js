@@ -5,6 +5,7 @@
 
   var C = OperaCore;
   var LEVELS = OPERA_LEVELS;
+  var ACTS = OPERA_ACTS;
   var $ = function (id) { return document.getElementById(id); };
 
   /* ================= memoria ================= */
@@ -312,9 +313,11 @@
   /* La trasformazione finale che l'animazione deve raggiungere, in coordinate
      CSS e con il perno come origine. Tenuta separata perche' e' il punto in cui
      un asse o un verso sbagliati non si vedrebbero fino a partita in corso. */
-  function transformFor(op, cell) {
+  function transformFor(op, cell, verso) {
     if (op.k === 'm') return 'translate(' + f(op.dx * cell) + 'px,' + f(op.dy * cell) + 'px)';
-    if (op.k === 'r') return 'rotate(' + op.d + 'deg)';
+    /* il mezzo giro si puo' fare da una parte o dall'altra: se un muro ne chiude
+       una, l'animazione deve girare dall'altra, se no si vede passare nel muro */
+    if (op.k === 'r') return 'rotate(' + (op.d === 180 ? 180 * (verso || 1) : op.d) + 'deg)';
     var A = AXIS_ANGLE[op.a];
     return 'rotate(' + A + 'deg) scaleY(-1) rotate(' + (-A) + 'deg)';
   }
@@ -337,7 +340,8 @@
     }
 
     if (op.k === 'r') {
-      return tween(fig, transformFor(op, cell), op.d === 180 ? 520 : 380);
+      var verso = op.d === 180 ? (C.spin(S.cells, [b.x, b.y], op, S.level) || 1) : 1;
+      return tween(fig, transformFor(op, cell, verso), op.d === 180 ? 520 : 380);
     }
 
     /* il ribaltamento parte dalla stessa forma con scaleY(1): cosi' il passaggio
@@ -366,7 +370,12 @@
     var res = C.apply(S.cells, [b.x, b.y], b.op);
     if (!C.isLegal(res, lv)) {
       shake();
-      say('Quella mossa porterebbe la figura fuori dal quadro.');
+      say('Quella mossa porterebbe la figura fuori dal quadro, o su un muro.');
+      return;
+    }
+    if (!C.pathClear(S.cells, [b.x, b.y], b.op, lv)) {
+      shake();
+      say('Un muro le taglia la strada: da lì non ci passa, e non ci gira nemmeno attraverso.');
       return;
     }
     S.busy = true;
@@ -511,43 +520,96 @@
       '<path d="M8.2 10.5V7.6a3.8 3.8 0 0 1 7.6 0v2.9" fill="none" stroke-width="2"/>' +
     '</svg>';
 
+  var ROMANI = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+
+  /* la sagoma del quadro in miniatura, normalizzata dentro il riquadro */
+  function miniShape(cells) {
+    var xs = [], ys = [], i;
+    for (i = 0; i < cells.length; i++) { xs.push(cells[i][0]); ys.push(cells[i][1]); }
+    var mx = Math.min.apply(null, xs), my = Math.min.apply(null, ys);
+    var w = Math.max.apply(null, xs) - mx + 1, h = Math.max.apply(null, ys) - my + 1;
+    var u = 100 / Math.max(w, h);
+    var ox = (100 - w * u) / 2, oy = (100 - h * u) / 2, d = '';
+    for (i = 0; i < cells.length; i++) {
+      var x = f(ox + (cells[i][0] - mx) * u), y = f(oy + (cells[i][1] - my) * u);
+      d += 'M' + x + ' ' + y + 'h' + f(u) + 'v' + f(u) + 'h' + f(-u) + 'Z';
+    }
+    return '<svg class="mini" viewBox="-6 -6 112 112" aria-hidden="true">' +
+             '<path d="' + d + '"/></svg>';
+  }
+
+  function tile(i, prossimo) {
+    var lv = LEVELS[i], best = store.best[lv.id];
+    if (!aperto(i)) {
+      return '<div class="lv locked" aria-disabled="true">' +
+               '<span class="lv-top"><span class="num">' + lv.n + '</span>' + LUCCHETTO + '</span>' +
+               '<span class="st">da aprire</span>' +
+             '</div>';
+    }
+    var cls = 'lv';
+    if (best !== undefined) cls += best <= lv.par ? ' done perfect' : ' done';
+    if (i === prossimo) cls += ' next';
+    var st = best === undefined
+      ? (i === prossimo ? '<em class="ora">da fare</em> · minimo ' + lv.par : 'minimo ' + lv.par)
+      : best + ' / ' + lv.par + (best <= lv.par ? ' <em>✦</em>' : ' <em>✓</em>');
+    return '<button class="' + cls + '" data-lv="' + i + '">' +
+             '<span class="lv-top"><span class="num">' + lv.n + '</span>' +
+               miniShape(lv.shape) + '</span>' +
+             '<span class="nm">' + lv.name + '</span>' +
+             '<span class="st">' + st + '</span>' +
+           '</button>';
+  }
+
   function buildMenu() {
-    var html = '', fatti = 0;
-    for (var i = 0; i < LEVELS.length; i++) {
-      var lv = LEVELS[i], best = store.best[lv.id];
-      if (best !== undefined) fatti++;
-      if (!aperto(i)) {
-        html += '<div class="lv locked" aria-disabled="true">' +
-                  '<span class="num">' + lv.n + '</span>' +
-                  '<span class="nm">' + LUCCHETTO + '</span>' +
-                  '<span class="st">da aprire</span>' +
-                '</div>';
-        continue;
+    var fatti = 0, i;
+    for (i = 0; i < LEVELS.length; i++) if (risolto(i)) fatti++;
+    var prossimo = primoDaFare();
+    var tutti = fatti === LEVELS.length;
+
+    var html = '';
+    for (var a = 0; a < ACTS.length; a++) {
+      var atto = ACTS[a], dentro = [], chiusi = 0, qualcunoAperto = false;
+      for (i = 0; i < LEVELS.length; i++) if (LEVELS[i].act === atto.n) {
+        dentro.push(i);
+        if (risolto(i)) chiusi++;
+        if (aperto(i)) qualcunoAperto = true;
       }
-      var cls = 'lv';
-      if (best !== undefined) cls += best <= lv.par ? ' done perfect' : ' done';
-      var st = best === undefined
-        ? 'minimo ' + lv.par
-        : best + ' / ' + lv.par + (best <= lv.par ? '  ✦' : '  ✓');
-      html += '<button class="' + cls + '" data-lv="' + i + '">' +
-                '<span class="num">' + lv.n + '</span>' +
-                '<span class="nm">' + lv.name + '</span>' +
-                '<span class="st">' + st + '</span>' +
-              '</button>';
+      if (!dentro.length) continue;
+
+      var testa = qualcunoAperto
+        ? '<span class="act-t">' + atto.title + '</span>' +
+          '<span class="act-note">' + atto.note + '</span>'
+        : '<span class="act-t da-scoprire">Da scoprire</span>';
+
+      html += '<section class="act' + (qualcunoAperto ? '' : ' act-locked') +
+                (chiusi === dentro.length ? ' act-done' : '') + '">' +
+                '<header class="act-head">' +
+                  '<span class="act-n">' + (ROMANI[atto.n] || atto.n) + '</span>' +
+                  '<span class="act-txt">' + testa + '</span>' +
+                  '<span class="act-count">' + chiusi + '/' + dentro.length + '</span>' +
+                '</header><div class="act-grid">';
+      for (i = 0; i < dentro.length; i++) html += tile(dentro[i], prossimo);
+      html += '</div></section>';
     }
     $('pickerGrid').innerHTML = html;
 
-    var prossimo = primoDaFare();
-    var tutti = fatti === LEVELS.length;
     $('menuLine').textContent = tutti
       ? 'Chiusi tutti e ' + LEVELS.length + ' i quadri. Si può sempre rigiocarli.'
       : fatti === 0
-        ? LEVELS.length + ' quadri. Se ne apre uno chiudendo quello prima.'
+        ? LEVELS.length + ' quadri in ' + ACTS.length + ' atti. Se ne apre uno chiudendo quello prima.'
         : fatti + ' quadri chiusi su ' + LEVELS.length + '.';
+    $('menuBar').firstChild.style.width = Math.round(fatti / LEVELS.length * 100) + '%';
     $('btnPlay').textContent = tutti
       ? 'Rigioca il primo'
       : fatti === 0 ? 'Comincia' : 'Riprendi dal quadro ' + LEVELS[prossimo].n;
     $('btnPlay').dataset.lv = tutti ? 0 : prossimo;
+
+    /* il quadro da fare va portato sotto gli occhi */
+    var segno = $('pickerGrid').querySelector('.lv.next');
+    if (segno) setTimeout(function () {
+      var g = $('pickerGrid');
+      g.scrollTop = Math.max(0, segno.offsetTop - g.clientHeight / 2);
+    }, 0);
   }
 
   function showMenu() {

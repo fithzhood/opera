@@ -31,6 +31,38 @@ lo stesso simbolo dà risultati diversi — è il cuore del rompicapo.
 - **simmetria** `{k:'x',a:'v'|'h'|'d1'|'d2'}` — assi verticale, orizzontale e i
   due obliqui a 45°. `d1` è l'asse `\` (manda `(x,y)` in `(y,x)`), `d2` è `/`
 
+### I muri fermano il cammino, non solo l'arrivo
+
+Un muro è un ostacolo, non una casella vietata: la figura non ci può passare
+**attraverso**. Quindi oltre alla posizione finale si controllano le pose
+intermedie (`pathClear` in `opera-core.js`):
+
+- **traslazione**: i passi di mezzo, uno per casella — gli stessi che si vedono
+  nell'animazione;
+- **rotazione**: l'arco campionato ogni 15°, arrotondato alla griglia. A 45°
+  soltanto non basterebbe: l'arrotondamento accorcia il raggio e un muro
+  sull'arco non verrebbe intercettato;
+- **simmetria**: niente, il ribaltamento avviene sul posto.
+
+Il bordo del quadro invece non frena il passaggio: conta solo dove la figura si
+ferma.
+
+**Il mezzo giro si può fare da due parti.** Se un muro chiude un verso si gira
+dall'altro (`spin()` restituisce +1, −1 o 0), e l'animazione segue quel verso —
+se no si vedrebbe la figura passare dentro il muro. Senza questo la regola non
+sarebbe nemmeno reversibile, e annullare una mossa potrebbe diventare
+impossibile.
+
+**Arrotondamento con margine.** A 30° un quadretto a distanza 3 cade esatto su
+1,5: lì il rumore di calcolo (1e-16) faceva cadere andata e ritorno da parti
+opposte. Con `Math.floor(v + 0.5 + 1e-9)` la regola è reversibile — verificato
+su 5172 combinazioni di forma, perno, verso e posizione del muro.
+
+**I muri li sceglie il generatore**, non io: messi negli angoli non frenerebbero
+mai niente e la regola resterebbe invisibile. La ricerca li piazza lontano dal
+bordo e scarta i quadri in cui un muro taglia la strada in meno del 14% delle
+posizioni raggiungibili (28% nel quadro che li introduce).
+
 ### Perché le rotazioni non sono a 45°
 
 Una rotazione di 45° non manda una griglia quadrata in sé stessa: la casella
@@ -43,6 +75,38 @@ ingrandimento di √2, così il dominio orizzontale `(0,0)-(1,0)` diventa
 `(0,0)-(1,1)`, due caselle che si toccano d'angolo. Tutto ricadrebbe esatto
 sulla griglia e due scatti da 45° darebbero una rotazione di 90° a taglia
 normale. È stato valutato e scartato: si è scelto di restare a multipli di 90°.)
+
+## Gli atti e la curva
+
+I quadri sono **44 divisi in 8 atti**, e ogni atto porta **una novita' sola**:
+punte, quarto di giro, assi dritti, assi obliqui, mezzo giro, muri, passi
+obliqui, e infine tutto insieme. La regola di progetto: la novita' si presenta
+su un quadro *facile* (griglia piccola, figura piccola, par basso) e poi ha
+quattro o cinque quadri per sedimentare prima che ne arrivi un'altra.
+
+Per questo il par **scende all'inizio di ogni atto** e poi risale:
+
+```
+atto 1  4 4 5 5 6
+atto 2  5 6 6 6 7
+atto 3  5 6 7 7 7 8
+atto 4  5 6 7 8 8 8
+atto 5  5 7 8 8 9
+atto 6  6 7 8 9 10
+atto 7  6 8 9 10 10
+atto 8  11 11 11 12 12 13 14
+```
+
+Gli atti stanno in `OPERA_ACTS`, e ogni livello porta il campo `act`.
+
+### Un passo obliquo non puo' essere indispensabile
+
+Il generatore controlla che la mossa protagonista dell'atto sia davvero
+necessaria, togliendo quei pulsanti e verificando che il quadro diventi
+irrisolvibile. Con le **traslazioni diagonali non funziona**: un passo in
+diagonale si rifa' sempre con due passi dritti, quindi non e' mai
+indispensabile finche' i dritti ci sono. Il quadro che le introduce ha percio'
+una tavolozza di **sole frecce oblique**.
 
 ## I livelli: come sono fatti
 
@@ -74,7 +138,12 @@ scelte per posizione nei quadri col domino fino a 3,3 nei pentomini.
 
 ## Il menu e lo sblocco
 
-Si parte sempre dal **menu**, non da un quadro. Il primo quadro e' aperto, ogni
+Si parte sempre dal **menu**, non da un quadro. Il menu e' diviso per atti: il
+numero romano, il titolo dell'atto e la riga che dice cosa introduce. Un atto
+che non e' ancora stato raggiunto mostra "Da scoprire" invece del titolo, cosi'
+la novita' resta una sorpresa. Ogni riquadro porta la **sagoma del quadro in
+miniatura** (verde se e' stato chiuso nel minimo), e quello da fare ha l'anello
+d'oro; all'apertura il menu ci scorre sopra da solo. Il primo quadro e' aperto, ogni
 altro si apre chiudendo quello prima (`store.best[id] !== undefined`); quelli
 gia' chiusi restano aperti e si possono rigiocare quante volte si vuole, e il
 punteggio salvato e' il minimo fra i tentativi.

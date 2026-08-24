@@ -64,16 +64,87 @@ var OperaCore = (function () {
     return false;
   }
 
-  /* Tutte le mosse giocabili da una posizione: pulsante coperto dalla figura
-     e risultato interamente dentro la griglia. */
+  /* ---------- il cammino ----------
+     Un muro non e' solo una casella vietata all'arrivo: e' un ostacolo, e la
+     figura non ci puo' passare attraverso. Quindi oltre alla posizione finale
+     si guardano le posizioni intermedie:
+       - traslazione: i passi di mezzo, uno per casella (gli stessi che si
+         vedono nell'animazione);
+       - rotazione: le pose a 45 gradi lungo l'arco, arrotondate alla griglia
+         (per il mezzo giro anche quelle a 90 e 135);
+       - simmetria: nessuna, perche' il ribaltamento avviene sul posto.
+     Il bordo del quadro invece non frena il passaggio: conta solo dove si
+     ferma la figura. */
+
+  /* L'arco va campionato fitto: prendendo solo la posa a 45 gradi il raggio si
+     accorcia con l'arrotondamento e un muro sull'arco non verrebbe intercettato.
+     A passi di 15 gradi il cammino di ogni quadretto e' seguito bene. */
+  /* Arrotondamento con un pizzico di margine: a 30 gradi un quadretto a
+     distanza 3 finisce esatto su 1,5, e li' il rumore di calcolo (1e-16) puo'
+     far cadere l'andata e il ritorno da parti opposte. Con il margine la
+     regola resta reversibile, che serve perche' annullare deve sempre poter
+     rifare la strada al contrario. */
+  function arr(v) { return Math.floor(v + 0.5 + 1e-9); }
+
+  function arcoLibero(cells, pivot, da, a, verso, walls) {
+    var passo = 15, g, i, t, c, s2, x, y, cx, cy;
+    for (g = da; g < a; g += passo) {
+      t = verso * g * Math.PI / 180; c = Math.cos(t); s2 = Math.sin(t);
+      for (i = 0; i < cells.length; i++) {
+        x = cells[i][0] - pivot[0]; y = cells[i][1] - pivot[1];
+        cx = arr(x * c - y * s2) + pivot[0];
+        cy = arr(x * s2 + y * c) + pivot[1];
+        if (walls[cx + ',' + cy]) return false;
+      }
+    }
+    return true;
+  }
+
+  /* Il mezzo giro si puo' fare da una parte o dall'altra: si sceglie il verso
+     libero. Restituisce +1, -1 oppure 0 se sono murati tutti e due. Serve anche
+     all'animazione, che deve girare dalla parte giusta. */
+  function spin(cells, pivot, op, level, walls) {
+    walls = walls || wallSet(level);
+    if (op.k !== 'r') return 0;
+    if (op.d !== 180) {
+      var v = op.d > 0 ? 1 : -1;
+      return arcoLibero(cells, pivot, 15, 90, v, walls) ? v : 0;
+    }
+    if (arcoLibero(cells, pivot, 15, 180, 1, walls)) return 1;
+    if (arcoLibero(cells, pivot, 15, 180, -1, walls)) return -1;
+    return 0;
+  }
+
+  function moveSweepClear(cells, op, walls) {
+    var steps = Math.max(Math.abs(op.dx), Math.abs(op.dy));
+    var k, i, sx = op.dx / steps, sy = op.dy / steps;
+    for (k = 1; k < steps; k++)
+      for (i = 0; i < cells.length; i++)
+        if (walls[(cells[i][0] + sx * k) + ',' + (cells[i][1] + sy * k)]) return false;
+    return true;
+  }
+
+  /* true se nessun muro taglia la strada alla figura */
+  function pathClear(cells, pivot, op, level, walls) {
+    walls = walls || wallSet(level);
+    if (op.k === 'm') return moveSweepClear(cells, op, walls);
+    if (op.k === 'r') return spin(cells, pivot, op, level, walls) !== 0;
+    return true;   /* il ribaltamento avviene sul posto */
+  }
+
+  /* Tutte le mosse giocabili da una posizione: pulsante coperto dalla figura,
+     risultato dentro la griglia e nessun muro sulla strada. */
   function moves(cells, level, walls) {
     walls = walls || wallSet(level);
-    var out = [], i, b, res;
+    var out = [], i, b, res, ok, libera;
     for (i = 0; i < level.buttons.length; i++) {
       b = level.buttons[i];
       if (!covers(cells, b.x, b.y)) continue;
       res = apply(cells, [b.x, b.y], b.op);
-      out.push({ index: i, button: b, cells: res, legal: isLegal(res, level, walls) });
+      ok = isLegal(res, level, walls);
+      libera = pathClear(cells, [b.x, b.y], b.op, level, walls);
+      out.push({ index: i, button: b, cells: res,
+                 legal: ok && libera, fuori: !ok, murata: ok && !libera });
     }
     return out;
   }
@@ -177,6 +248,7 @@ var OperaCore = (function () {
 
   return {
     key: key, apply: apply, isLegal: isLegal, covers: covers, moves: moves,
+    pathClear: pathClear, spin: spin,
     solved: solved, solve: solve, reachable: reachable, outline: outline,
     wallSet: wallSet
   };

@@ -298,50 +298,123 @@ body {
 #menu { display: none; }
 #app.in-menu #menu {
   display: flex; flex-direction: column; align-items: center;
-  flex: 1; min-height: 0; width: 100%; max-width: 720px; gap: 12px;
+  flex: 1; min-height: 0; width: 100%; max-width: 780px; gap: 14px;
 }
 #app.in-menu #stage,
 #app.in-menu #tools,
 #app.in-menu #score,
 #app.in-menu #btnLevels { display: none; }
 
+#menuHead { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 8px; }
 #menuLine { margin: 0; font-size: 13px; color: var(--text-dim); text-align: center; }
-#menu #pickerGrid { flex: 1; min-height: 0; overflow-y: auto; width: 100%; padding: 2px; margin: 0; }
-#menuFoot { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+#menuBar {
+  height: 3px; border-radius: 3px; overflow: hidden;
+  background: rgba(255,255,255,.07);
+}
+#menuBar i {
+  display: block; height: 100%; width: 0;
+  background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+  transition: width .5s cubic-bezier(.3,0,.2,1);
+}
 
-#pickerGrid {
+#menu #pickerGrid {
+  flex: 1; min-height: 0; overflow-y: auto;
+  width: 100%; padding: 2px 4px; margin: 0;
+  display: flex; flex-direction: column; gap: 22px;
+  scrollbar-width: thin; scrollbar-color: #2c3644 transparent;
+}
+#menu #pickerGrid::-webkit-scrollbar { width: 8px; }
+#menu #pickerGrid::-webkit-scrollbar-thumb { background: #2c3644; border-radius: 4px; }
+
+/* ---- un atto ---- */
+
+.act-head {
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 0 2px 7px;
+  border-bottom: 1px solid var(--ink-line);
+  margin-bottom: 10px;
+}
+.act-n {
+  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  font-size: 17px; letter-spacing: .06em; color: var(--gold);
+  min-width: 2.4em;
+}
+.act-txt { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.act-t {
+  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  font-size: 15px; color: var(--paper-dim); letter-spacing: .02em;
+}
+.act-t.da-scoprire { color: var(--text-dim); font-style: italic; }
+.act-note { font-size: 11.5px; color: var(--text-dim); line-height: 1.35; }
+.act-count {
+  font-size: 11px; color: var(--text-dim);
+  font-variant-numeric: tabular-nums; letter-spacing: .06em;
+}
+.act-locked .act-n { color: #4b5666; }
+.act-done .act-count { color: var(--gold); }
+
+.act-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
   gap: 8px;
-  align-content: start;
 }
+
+/* ---- un quadro ---- */
+
 .lv {
+  position: relative;
+  display: flex; flex-direction: column; gap: 5px;
   text-align: left; font: inherit;
-  background: #141a23; color: var(--text);
-  border: 1px solid var(--ink-line); border-radius: 9px;
-  padding: 9px 10px; cursor: pointer;
-  transition: border-color .15s, background .15s;
+  background: linear-gradient(180deg, #161d27, #121821);
+  color: var(--text);
+  border: 1px solid var(--ink-line); border-radius: 10px;
+  padding: 9px 10px 8px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s, transform .12s;
 }
-.lv:hover { background: #1d2530; border-color: #3d4a5b; }
-.lv.current { border-color: var(--gold); }
-.lv .num { font-size: 11px; color: var(--text-dim); letter-spacing: .08em; }
-.lv .nm { display: block; font-size: 13px; margin: 2px 0 4px; }
-.lv .st { font-size: 11px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
-.lv.done .st { color: #7fa07f; }
+.lv:hover { background: linear-gradient(180deg, #1d2733, #161d28); border-color: #46566b; transform: translateY(-1px); }
+.lv:active { transform: translateY(0); }
+
+.lv-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.lv .num {
+  font-size: 11px; color: var(--text-dim);
+  font-variant-numeric: tabular-nums; letter-spacing: .08em;
+}
+.lv .mini { width: 21px; height: 21px; display: block; opacity: .9; }
+.lv .mini path { fill: var(--figure); }
+.lv .nm { font-size: 13px; line-height: 1.25; }
+.lv .st {
+  font-size: 11px; color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+.lv .st em { font-style: normal; }
+
+.lv.done { border-color: #33404f; }
+.lv.done .st { color: #82a382; }
 .lv.perfect .st { color: var(--gold); }
+.lv.perfect .mini path { fill: var(--figure-ok); }
+
+/* il quadro da fare: un anello d'oro e un alone appena accennato */
+.lv.next {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px rgba(211,163,74,.35), 0 6px 18px rgba(211,163,74,.10);
+}
+.lv .st em.ora {
+  color: var(--gold); font-style: normal;
+  letter-spacing: .04em;
+}
 
 /* da aprire: niente nome, solo il numero e il lucchetto */
 .lv.locked {
   cursor: default;
-  border-style: dashed;
-  background: #11161e;
-  opacity: .55;
+  background: #10151d;
+  border-style: dashed; border-color: #232c39;
+  color: var(--text-dim);
 }
-.lv.locked .nm { min-height: 20px; }
-.lv .lock {
-  width: 17px; height: 17px; display: block; margin-top: 2px;
-  fill: var(--text-dim); stroke: var(--text-dim);
-}
+.lv.locked .lock { width: 16px; height: 16px; display: block; fill: #46505f; stroke: #46505f; }
+.lv.locked .st { color: #4b5666; }
+
+#menuFoot { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
 
 @media (max-width: 700px) {
   #top { flex-wrap: wrap; gap: 8px; }
@@ -372,7 +445,9 @@ body.capacitor { --sa-t: max(env(safe-area-inset-top, 0px), 34px); }
   }
   #app.in-menu #brand { order: 0; flex: 1; font-size: 18px; }
   #app.in-menu #menu { max-width: none; }
-  #app.in-menu #menu #pickerGrid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  #app.in-menu .act-grid { grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); }
+  #app.in-menu #pickerGrid { gap: 16px; }
+  #app.in-menu .act-note { display: none; }   /* coricati la riga si mangia l'altezza */
 
   /* coricati il foro sta di lato, non piu' in cima */
   body.capacitor {
