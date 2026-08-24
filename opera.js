@@ -270,7 +270,6 @@
     root.setProperty('--rows', lv.rows);
 
     placeChrome(window.matchMedia('(orientation: landscape) and (max-height: 620px)').matches);
-    riparo();
 
     root.setProperty('--cell', '1px');
     var stage = $('stage'), box = stage.getBoundingClientRect();
@@ -588,17 +587,6 @@
   }
 
   /* ================= dentro l'APK ================= */
-
-  /* Dentro l'APK il sistema a volte fa gia' spazio al foro della fotocamera
-     (la pagina risulta piu' corta dello schermo) e a volte no. Nel secondo caso
-     env(safe-area-inset-*) resta a zero e il titolo finisce sotto il foro:
-     allora il margine minimo sul bordo corto ce lo mettiamo noi. */
-  function riparo() {
-    if (!isCapacitorNative()) return;
-    var lungoSchermo = Math.max(screen.width, screen.height);
-    var lungoPagina = Math.max(window.innerWidth, window.innerHeight);
-    document.body.classList.toggle('senza-riparo', lungoSchermo - lungoPagina < 8);
-  }
 
   function isCapacitorNative() {
     return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
