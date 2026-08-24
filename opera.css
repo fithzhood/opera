@@ -1,0 +1,306 @@
+/* Opera — foglio di stile */
+
+:root {
+  --ink:        #10141b;
+  --ink-soft:   #19202b;
+  --ink-line:   #2a3441;
+  --paper:      #e9e3d5;
+  --paper-dim:  #ded7c6;
+  --paper-line: #c6bda8;
+  --figure:     #2f6470;
+  --figure-hi:  #3d818f;
+  --figure-ink: #0f2b32;
+  --gold:       #d3a34a;
+  --gold-soft:  #8a6a26;
+  --text:       #e6e1d6;
+  --text-dim:   #97a0ad;
+  --danger:     #b45a45;
+  --cell:       64px;
+  --cols:       6;
+  --rows:       6;
+  --radius:     10px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; height: 100%;
+  background: var(--ink);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background:
+    radial-gradient(120% 90% at 50% -20%, #1c2431 0%, transparent 60%),
+    var(--ink);
+}
+
+#app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 18px 18px;
+  gap: 10px;
+}
+
+/* ---------- testata ---------- */
+
+#top {
+  width: 100%; max-width: 980px;
+  display: flex; align-items: center; gap: 16px;
+}
+
+#brand {
+  flex: 1;
+  margin: 0;
+  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  font-size: 26px; font-weight: 600; letter-spacing: .16em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--paper);
+}
+
+#score { display: flex; gap: 8px; }
+
+.pill {
+  display: flex; flex-direction: column; align-items: center;
+  min-width: 62px; padding: 5px 10px;
+  background: var(--ink-soft);
+  border: 1px solid var(--ink-line);
+  border-radius: 8px;
+  line-height: 1.15;
+}
+.pill span { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); }
+.pill b { font-size: 17px; font-variant-numeric: tabular-nums; }
+.pill.perfect b { color: var(--gold); }
+
+/* ---------- pulsanti di servizio ---------- */
+
+.tool {
+  font: inherit; font-size: 13px;
+  color: var(--text);
+  background: var(--ink-soft);
+  border: 1px solid var(--ink-line);
+  border-radius: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s, transform .1s;
+}
+.tool:hover { background: #222b38; border-color: #3a4757; }
+.tool:active { transform: translateY(1px); }
+.tool:disabled { opacity: .35; cursor: default; }
+.tool:disabled:hover { background: var(--ink-soft); border-color: var(--ink-line); }
+.tool.primary { background: var(--gold); color: #241a06; border-color: var(--gold); font-weight: 600; }
+.tool.primary:hover { background: #e2b45f; }
+.tool.danger { color: var(--danger); }
+.tool.toggle.on { color: var(--gold); border-color: var(--gold-soft); }
+
+/* ---------- scena ---------- */
+
+#stage {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center;
+  gap: 12px; width: 100%;
+}
+
+#levelName {
+  margin: 0;
+  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  font-size: 19px; font-style: italic; color: var(--paper-dim);
+}
+
+#boardWrap { position: relative; }
+
+#board {
+  position: relative;
+  width: calc(var(--cols) * var(--cell));
+  height: calc(var(--rows) * var(--cell));
+  background: var(--paper);
+  border-radius: var(--radius);
+  box-shadow: 0 18px 50px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.4);
+  overflow: hidden;
+}
+
+.layer { position: absolute; inset: 0; }
+#figureLayer, #marks { pointer-events: none; }
+
+/* piano 1: le caselle */
+
+#cells {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--cell));
+  grid-template-rows: repeat(var(--rows), var(--cell));
+}
+.cell {
+  border-right: 1px solid var(--paper-line);
+  border-bottom: 1px solid var(--paper-line);
+}
+.cell.edge-r { border-right-color: transparent; }
+.cell.edge-b { border-bottom-color: transparent; }
+.cell.target { background: rgba(211,163,74,.20); }
+.cell.wall {
+  background:
+    repeating-linear-gradient(45deg, #222a35 0 6px, #1a212b 6px 12px);
+  border-color: #2b3441;
+}
+
+/* piano 2: la figura */
+
+#figure { position: absolute; inset: 0; will-change: transform; }
+#figure svg { position: absolute; inset: 0; overflow: visible; }
+.fig-body { fill: var(--figure); }
+.fig-edge { fill: none; stroke: var(--figure-ink); stroke-width: 3; stroke-linejoin: round; }
+.fig-seam { stroke: rgba(255,255,255,.13); stroke-width: 1.5; }
+.fig-sheen { fill: rgba(255,255,255,.07); }
+#figure.won .fig-body { fill: var(--gold); transition: fill .35s; }
+#figure.won .fig-edge { stroke: #6b4f13; transition: stroke .35s; }
+#figureLayer.shake { animation: shake .3s; }
+@keyframes shake {
+  0%,100% { }
+  20% { transform: translateX(-5px); }
+  45% { transform: translateX(5px); }
+  70% { transform: translateX(-3px); }
+}
+
+/* piano 3: i pulsanti */
+
+#controls {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--cell));
+  grid-template-rows: repeat(var(--rows), var(--cell));
+}
+.ctrl {
+  position: relative;
+  display: grid; place-items: center;
+  border: 0; padding: 0; margin: 0;
+  background: transparent;
+  cursor: default;
+  -webkit-tap-highlight-color: transparent;
+}
+.ctrl svg { width: 74%; height: 74%; display: block; }
+.ctrl .glyph { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
+.ctrl .glyph-f { fill: currentColor; stroke: none; }
+
+/* spento: il pulsante c'e' ma la figura non ci sta sopra */
+.ctrl.op {
+  pointer-events: auto;
+  color: #5f5949; opacity: .62;
+  transition: color .18s, opacity .18s;
+}
+
+/* acceso: la figura lo copre e la mossa e' possibile */
+.ctrl.op.live { cursor: pointer; color: #f4efe3; opacity: 1; }
+.ctrl.op.live::before {
+  content: ""; position: absolute; inset: 9%;
+  border-radius: 8px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.20);
+  transition: background .15s, border-color .15s, transform .12s;
+}
+.ctrl.op.live:hover::before { background: rgba(255,255,255,.17); border-color: rgba(255,255,255,.5); }
+.ctrl.op.live:active::before { transform: scale(.93); }
+
+/* coperto, ma la mossa porterebbe fuori dal quadro */
+.ctrl.op.blocked { cursor: not-allowed; color: #efab95; opacity: .85; }
+.ctrl.op.blocked::before {
+  content: ""; position: absolute; inset: 9%;
+  border-radius: 8px;
+  background: rgba(180,90,69,.16);
+  border: 1px dashed rgba(239,171,149,.45);
+}
+
+.ctrl.op.hinted::after {
+  content: ""; position: absolute; inset: 3%;
+  border-radius: 10px;
+  border: 2px solid var(--gold);
+  animation: pulse 1.1s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100% { opacity: .3; } 50% { opacity: 1; } }
+
+/* piano 4: sagoma d'arrivo e anteprima */
+
+#marks svg { position: absolute; inset: 0; overflow: visible; }
+.target-edge {
+  fill: none; stroke: var(--gold-soft); stroke-width: 2.5;
+  stroke-dasharray: 9 7; stroke-linejoin: round;
+}
+.ghost-edge {
+  fill: rgba(47,100,112,.16); stroke: var(--figure-hi); stroke-width: 2;
+  stroke-dasharray: 5 5; stroke-linejoin: round;
+}
+.pivot-dot { fill: var(--gold); }
+
+/* ---------- riga di suggerimento e barra strumenti ---------- */
+
+#hint {
+  margin: 0; min-height: 20px;
+  font-size: 13px; color: var(--text-dim); text-align: center;
+  max-width: 560px;
+}
+
+#tools { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+
+/* ---------- pannelli ---------- */
+
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(6,9,14,.78);
+  backdrop-filter: blur(3px);
+  display: none; place-items: center;
+  padding: 24px; z-index: 20;
+}
+.overlay.open { display: grid; }
+
+.sheet {
+  background: var(--ink-soft);
+  border: 1px solid var(--ink-line);
+  border-radius: 14px;
+  padding: 22px 24px;
+  max-width: 640px; width: 100%;
+  max-height: 86vh; overflow: auto;
+  box-shadow: 0 24px 60px rgba(0,0,0,.6);
+}
+.sheet.narrow { max-width: 440px; }
+.sheet h2 {
+  margin: 0 0 14px;
+  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  font-size: 21px; font-weight: 600; letter-spacing: .04em;
+  color: var(--paper);
+}
+.sheet p { margin: 0 0 16px; color: var(--text-dim); line-height: 1.55; }
+.sheet ul { margin: 0 0 18px; padding-left: 20px; color: var(--text-dim); line-height: 1.6; font-size: 14px; }
+.sheet li { margin-bottom: 7px; }
+.sheet li b { color: var(--paper-dim); }
+.sheet-foot { display: flex; gap: 8px; justify-content: space-between; }
+.sheet-foot.center { justify-content: center; }
+
+#pickerGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 8px; margin-bottom: 18px;
+}
+.lv {
+  text-align: left; font: inherit;
+  background: #141a23; color: var(--text);
+  border: 1px solid var(--ink-line); border-radius: 9px;
+  padding: 9px 10px; cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.lv:hover { background: #1d2530; border-color: #3d4a5b; }
+.lv.current { border-color: var(--gold); }
+.lv .num { font-size: 11px; color: var(--text-dim); letter-spacing: .08em; }
+.lv .nm { display: block; font-size: 13px; margin: 2px 0 4px; }
+.lv .st { font-size: 11px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+.lv.done .st { color: #7fa07f; }
+.lv.perfect .st { color: var(--gold); }
+
+@media (max-width: 700px) {
+  #top { flex-wrap: wrap; gap: 8px; }
+  #brand { order: -1; width: 100%; font-size: 21px; }
+  .pill { min-width: 54px; padding: 4px 8px; }
+  #app { padding: 10px 10px 14px; }
+}

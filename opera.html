@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<title>Opera</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta name="description" content="Rompicapo di traslazioni, rotazioni e simmetrie su griglia quadrata.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%224%22%20fill%3D%22%23e9e3d5%22/%3E%3Cpath%20d%3D%22M5%205h13v9h9v13H14v-9H5z%22%20fill%3D%22%232f6470%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="opera.css?v=3">
+</head>
+<body>
+
+<div id="app">
+
+  <header id="top">
+    <button class="tool" id="btnLevels">Quadri</button>
+    <h1 id="brand">Opera</h1>
+    <div id="score">
+      <div class="pill"><span>Quadro</span><b id="levNum">1</b></div>
+      <div class="pill"><span>Mosse</span><b id="moveCount">0</b></div>
+      <div class="pill"><span>Minimo</span><b id="parVal">–</b></div>
+    </div>
+  </header>
+
+  <main id="stage">
+    <p id="levelName"></p>
+    <div id="boardWrap">
+      <div id="board">
+        <div class="layer" id="cells"></div>
+        <div class="layer" id="figureLayer"><div id="figure"></div></div>
+        <div class="layer" id="controls"></div>
+        <div class="layer" id="marks"></div>
+      </div>
+    </div>
+    <p id="hint"></p>
+  </main>
+
+  <footer id="tools">
+    <button class="tool" id="btnUndo">Annulla</button>
+    <button class="tool" id="btnReset">Ricomincia</button>
+    <button class="tool" id="btnHint">Aiuto</button>
+    <button class="tool toggle" id="btnPreview">Anteprima</button>
+    <button class="tool" id="btnRules">Regole</button>
+  </footer>
+
+</div>
+
+<div class="overlay" id="picker">
+  <div class="sheet">
+    <h2>I quadri</h2>
+    <div id="pickerGrid"></div>
+    <div class="sheet-foot">
+      <button class="tool" id="btnClosePicker">Chiudi</button>
+      <button class="tool danger" id="btnWipe">Azzera i progressi</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="win">
+  <div class="sheet narrow">
+    <h2 id="winTitle">Risolto</h2>
+    <p id="winLine"></p>
+    <div class="sheet-foot center">
+      <button class="tool" id="btnAgain">Rigioca</button>
+      <button class="tool primary" id="btnNext">Quadro seguente</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="howto">
+  <div class="sheet narrow">
+    <h2>Come si gioca</h2>
+    <ul id="howtoList">
+      <li>La figura va portata esattamente dentro la <b>sagoma tratteggiata</b>.</li>
+      <li>Ogni quadretto disegnato è un <b>pulsante</b>, ma funziona solo se la figura ci sta sopra: i pulsanti accesi sono quelli chiari, sul corpo della figura.</li>
+      <li>Le <b>punte</b> spostano: una punta una casella, due punte due caselle, tre punte tre.</li>
+      <li>La <b>freccia curva</b> gira la figura di un quarto di giro (o di mezzo giro) attorno al quadretto premuto.</li>
+      <li>L'<b>asse tratteggiato</b> ribalta la figura; l'asse passa per il quadretto premuto e può essere anche obliquo.</li>
+      <li>Una mossa che porterebbe la figura fuori dal quadro, o su un muro, non si può fare.</li>
+    </ul>
+    <div class="sheet-foot center">
+      <button class="tool primary" id="btnCloseHowto">Ho capito</button>
+    </div>
+  </div>
+</div>
+
+<script src="opera-core.js?v=3"></script>
+<script src="opera-levels.js?v=3"></script>
+<script src="opera.js?v=3"></script>
+</body>
+</html>
