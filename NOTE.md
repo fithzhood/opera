@@ -90,6 +90,18 @@ Attenzione: nel pannello di anteprima nascosto i timer vengono strozzati a ~1s,
 quindi le prove che campionano a metà animazione non funzionano. Si aspetta uno
 stato (il contatore delle mosse che cambia), non un tempo.
 
+## Due scelte di disegno che sembrano dettagli
+
+- **Il corpo della figura è UN solo tracciato con un rettangolo per cella.** Non
+  il contorno unito: i quadretti possono toccarsi solo d'angolo e il
+  tracciamento degli anelli si romperebbe. E deve essere un tracciato solo, se
+  no fra caselle vicine resta un filo chiaro durante le rotazioni.
+- **Il tratteggio della sagoma d'arrivo ha un alone chiaro sotto** (`.target-halo`,
+  stesso `dasharray`, più spesso). Senza, dove la figura è già appoggiata sulla
+  sagoma le trattine scure sparivano dentro il rosso.
+- **Il verde vale "a posto", non "a metà strada"**: arriva solo quando la figura
+  è tutta dentro la sagoma, e torna rossa se si annulla.
+
 ## Pubblicazione
 
 - **Live**: <https://fithzhood.github.io/opera/opera.html>
@@ -115,6 +127,33 @@ adattiva il disegno va quindi tenuto entro il ~70% del lato, cioe' dentro il
 cerchio inscritto. Dal `<background>` va invece tolto l'inset che
 `capacitor-assets` scrive, se no resta un alone al bordo della maschera — e va
 ripatchato **dopo** ogni `capacitor-assets generate`.
+
+### Il foro della fotocamera
+
+`env(safe-area-inset-*)` **non basta**: dipende da chi fa spazio. Sul Pixel 6
+emulato il sistema rientra da solo la WebView sotto il foro (la pagina risulta
+piu' corta dello schermo di ~52 punti) e l'inset dichiarato resta a zero, il che
+e' corretto; su altri telefoni la pagina copre tutto e l'inset resta a zero lo
+stesso, e li' il titolo finisce sotto il foro.
+
+Provare a distinguere i due casi confrontando `innerHeight` con `screen.height`
+non regge: la differenza c'e' anche senza foro (barre di sistema nascoste ma
+ancora conteggiate). Percio' dentro l'APK si tiene **sempre** il massimo fra il
+valore dichiarato e un minimo di 34 px sul bordo corto — in cima da fermi, di
+lato quando il telefono e' coricato. Dove il valore c'e' comanda quello.
+
+### Guardare dentro la WebView dell'APK
+
+Si puo' avere una console vera nell'app installata, senza Chrome:
+
+```bash
+adb forward tcp:9222 localabstract:webview_devtools_remote_$(adb shell pidof com.lfili.opera)
+```
+
+poi `curl http://localhost:9222/json/list` per l'indirizzo della pagina e un
+piccolo script Node che apra la WebSocket e mandi `Runtime.evaluate` (Node 22+
+ha `WebSocket` gia' dentro). E' cosi' che si e' scoperto che l'inset del foro
+era davvero zero invece di dedurlo dagli screenshot.
 
 ## Cose ancora da fare
 
