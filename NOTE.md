@@ -305,6 +305,24 @@ Il testo **non e' selezionabile** (`user-select: none` su `html, body`): vale
 per tutte le app dell'utente tranne quelle per scrivere. Vedi la memoria
 `testo-non-selezionabile`.
 
+## La riga dei messaggi non muove il quadro
+
+La riga sotto il quadro ha **altezza fissa** e il messaggio ci **galleggia
+dentro staccato dal flusso** (`position: absolute` dentro un contenitore
+`relative`): cosi' un avviso puo' comparire, allungarsi su due righe o sparire
+senza spostare la griglia di un pixel. Non basta un `min-height`: un messaggio
+piu' lungo del previsto lo sfonderebbe.
+
+Perche' regga, i testi sono **corti apposta** — i messaggi di passaggio stanno
+in una riga anche a 384 px, e nessun suggerimento di livello supera i 78
+caratteri. Verificato per misura: 100 quadri x 8 messaggi a 384, 520 e 760 px,
+il rettangolo del quadro non cambia mai.
+
+Il **vicolo cieco** (da qui la sagoma non e' piu' raggiungibile) ha un
+trattamento a parte: fondo caldo, contorno, testo in ambra e grassetto. Si
+ricontrolla dopo ogni mossa, ogni annulla, ogni rifai e ogni ricomincia
+(`aggiornaMessaggio()`), non solo dopo una mossa.
+
 ## Due scelte di disegno che sembrano dettagli
 
 - **Il corpo della figura è UN solo tracciato con un rettangolo per cella.** Non

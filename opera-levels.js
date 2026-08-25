@@ -19,7 +19,7 @@ var OPERA_ACTS = [
 var OPERA_LEVELS = [
   {
     id: 'q1', n: 1, act: 1, name: "First Step", par: 3,
-    hint: "The arrowheads move the figure. A square only works while the figure stands on it.",
+    hint: "Arrowheads move the figure. A square only works while the figure stands on it.",
     cols: 4, rows: 4,
     shape: [[1,0],[2,0]],
     target: [[0,2],[1,2]],
@@ -39,7 +39,7 @@ var OPERA_LEVELS = [
   },
   {
     id: 'q2', n: 2, act: 1, name: "Two Squares", par: 4,
-    hint: "The number of arrowheads tells you how many squares it moves.",
+    hint: "The number of arrowheads is how many squares it moves.",
     cols: 5, rows: 5,
     shape: [[1,3],[2,3]],
     target: [[2,1],[3,1]],
@@ -342,7 +342,7 @@ var OPERA_LEVELS = [
   },
   {
     id: 'q12', n: 12, act: 2, name: "The Hinge", par: 5,
-    hint: "The pivot is always the square you press: choosing it well changes everything.",
+    hint: "The pivot is the square you press: choosing it well changes everything.",
     cols: 5, rows: 5,
     shape: [[1,2],[2,2]],
     target: [[4,0],[4,1]],
@@ -632,7 +632,7 @@ var OPERA_LEVELS = [
   },
   {
     id: 'q21', n: 21, act: 3, name: "The Mirror", par: 5,
-    hint: "The dashed axis flips the figure, and it runs through the square you press.",
+    hint: "The dashed axis flips the figure, and runs through the square you press.",
     cols: 5, rows: 5,
     shape: [[3,2],[4,2],[4,3]],
     target: [[1,3],[2,3],[1,4]],
@@ -1605,7 +1605,7 @@ var OPERA_LEVELS = [
   },
   {
     id: 'q51', n: 51, act: 6, name: "The First Wall", par: 5,
-    hint: "Dark squares are walls: the figure can't land on them, and can't turn through them either.",
+    hint: "Dark squares are walls: no landing on them, and no turning through them.",
     cols: 5, rows: 5,
     shape: [[0,3],[1,3],[1,4]],
     target: [[1,0],[1,1],[2,1]],
@@ -1906,7 +1906,7 @@ var OPERA_LEVELS = [
   },
   {
     id: 'q61', n: 61, act: 7, name: "The Slanted Step", par: 6,
-    hint: "Here every arrow is diagonal: from this act on you can move at a slant.",
+    hint: "Every arrow here is diagonal: from now on you can move at a slant.",
     cols: 6, rows: 6,
     shape: [[4,4],[5,4],[5,5]],
     target: [[4,2],[5,2],[5,3]],
@@ -2251,7 +2251,7 @@ var OPERA_LEVELS = [
   },
   {
     id: 'q71', n: 71, act: 8, name: "The Ember", par: 5,
-    hint: "Amber squares are fire: the piece that comes to rest on one burns away for good. Here you must keep clear of it.",
+    hint: "Amber squares are fire: the piece that stops on one burns away for good.",
     cols: 5, rows: 5,
     shape: [[0,3],[1,3],[1,4]],
     target: [[3,1],[3,2],[4,2]],
@@ -2884,7 +2884,7 @@ var OPERA_LEVELS = [
   },
   {
     id: 'q91', n: 91, act: 10, name: "Grand Concerto", par: 10,
-    hint: "From here on it's everything you have learned, on the widest figures.",
+    hint: "From here on, everything you have learned, on the widest figures.",
     cols: 7, rows: 7,
     shape: [[4,4],[5,4],[3,5],[4,5],[4,6]],
     target: [[5,1],[4,2],[5,2],[6,2],[6,3]],

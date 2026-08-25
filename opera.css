@@ -296,9 +296,34 @@ body {
 /* ---------- riga di suggerimento e barra strumenti ---------- */
 
 #hint {
-  margin: 0; min-height: 20px;
+  margin: 0;
   font-size: 13px; color: var(--text-dim); text-align: center;
-  max-width: 560px;
+  max-width: 560px; width: 100%;
+  position: relative;
+}
+/* L'altezza della riga e' fissa e il messaggio ci galleggia dentro, staccato
+   dal flusso: cosi' un avviso puo' comparire, allungarsi o sparire senza far
+   muovere il quadro. */
+#stage #hint { height: 40px; }
+#stage #hint .msg {
+  position: absolute; left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+}
+#hint .msg { display: inline-block; line-height: 1.35; }
+
+/* vicolo cieco: da qui non si vince piu', e si deve vedere */
+#hint.vicolo { color: #f4b98f; font-weight: 600; }
+#hint.vicolo .msg {
+  padding: 7px 16px; border-radius: 8px;
+  background: rgba(158,56,28,.28);
+  border: 1px solid rgba(228,146,96,.55);
+  width: auto; max-width: 100%;
+  animation: allarme .35s ease-out;
+}
+@keyframes allarme {
+  0%   { opacity: 0; transform: translate(-50%, -58%); }
+  100% { opacity: 1; transform: translate(-50%, -50%); }
 }
 
 #tools { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; align-items: center; }

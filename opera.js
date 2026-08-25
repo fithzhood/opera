@@ -405,12 +405,12 @@
     var res = C.apply(S.cells, [b.x, b.y], b.op);
     if (!C.isLegal(res, lv)) {
       shake();
-      say('That move would take the figure off the board, or onto a wall.');
+      say('No room: that move would not fit.');
       return;
     }
     if (!C.pathClear(S.cells, [b.x, b.y], b.op, lv)) {
       shake();
-      say('A wall is in the way: it cannot pass through, and cannot turn through it either.');
+      say('A wall blocks the way.');
       return;
     }
     /* il fuoco brucia dove la figura si posa, non dove passa */
@@ -418,7 +418,7 @@
     var dopo = C.burn(res, fuoco);
     if (!dopo.length) {
       shake();
-      say('That move would burn the whole figure away.');
+      say('That would burn the whole figure.');
       return;
     }
     var bruciati = res.filter(function (c) { return fuoco && fuoco[c[0] + ',' + c[1]]; });
@@ -448,12 +448,26 @@
 
   function afterMove() {
     if (C.solved(S.cells, S.level)) { win(); return; }
-    var path = C.solve(S.level, S.cells);
-    if (path === null) say('From here the outline can no longer be reached: undo, or restart.');
-    else say(S.level.hint || '');
+    aggiornaMessaggio();
   }
 
-  function say(t) { $('hint').textContent = t || ''; }
+  /* Il testo sta SEMPRE dentro lo stesso involucro, e l'involucro e' staccato
+     dal flusso: la riga dei messaggi ha un'altezza fissa e non fa muovere il
+     quadro di un pixel, per lungo o corto che sia il messaggio. */
+  function say(t, allarme) {
+    var h = $('hint');
+    h.classList.toggle('vicolo', !!allarme);
+    h.innerHTML = t ? '<span class="msg">' + t + '</span>' : '';
+  }
+
+  /* Il vicolo cieco va detto forte: da li' non si vince piu' e senza un avviso
+     si continua a provare a vuoto. Il messaggio e' corto apposta, cosi' su uno
+     schermo stretto sta in due righe e lo spazio riservato basta sempre. */
+  function aggiornaMessaggio() {
+    if (C.solve(S.level, S.cells) === null)
+      say('Dead end — the outline can’t be reached from here.', true);
+    else say(S.level.hint || '');
+  }
 
   function win() {
     $('figure').classList.add('won');
@@ -525,7 +539,7 @@
     S.hintIdx = -1;
     $('figure').classList.remove('won');
     render();
-    say(S.level.hint || '');
+    aggiornaMessaggio();
   }
 
   function redo() {
@@ -547,18 +561,18 @@
     S.hintIdx = -1;
     $('figure').classList.remove('won');
     render();
-    say(S.level.hint || '');
+    aggiornaMessaggio();
   }
 
   function hint() {
     if (S.busy) return;
     var path = C.solve(S.level, S.cells);
-    if (path === null) { say('From here the outline can no longer be reached: undo, or restart.'); return; }
+    if (path === null) { aggiornaMessaggio(); return; }
     if (!path.length) { say('You are already there.'); return; }
     S.hintIdx = path[0];
     updateControls();
-    say('From here ' + path.length + (path.length === 1 ? ' move is' : ' moves are') +
-        ' enough. The ringed square is a right one.');
+    say('The ringed square is a right move — ' + path.length +
+        (path.length === 1 ? ' move to go.' : ' moves to go.'));
   }
 
   /* ================= anteprima al passaggio del mouse ================= */
