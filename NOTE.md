@@ -126,8 +126,8 @@ giri o ribalti.
 ## Le stelle
 
 Chiudere un quadro vale **da una a tre stelle**: tre nel minimo di mosse, due
-entro un margine che **cresce col quadro** (`max(3, par/2)` mosse in piu' — su
-un quadro da 14 sono sette, su uno da 3 sono tre), una comunque. Per entrare in un quadro serve un totale
+entro **il doppio del minimo**, una comunque. Cosi' la fascia cresce da sola col
+quadro: su uno da 3 mosse bastano 6, su uno da 14 ne bastano 28. Per entrare in un quadro serve un totale
 di stelle — **non** aver chiuso quello prima. Cosi' un quadro che non viene non
 blocca la strada.
 

@@ -543,12 +543,10 @@
 
   function risolto(i) { return store.best[LEVELS[i].id] !== undefined; }
 
-  /* La fascia delle due stelle cresce col quadro: due mosse di margine su un
-     quadro da 14 sono niente, su uno da 3 sono tante. Almeno tre di margine. */
-  function margine2(par) { return Math.max(3, Math.round(par * 0.5)); }
-
+  /* Tre stelle nel minimo di mosse, due entro il doppio del minimo, una
+     comunque: la fascia cresce col quadro senza bisogno di correzioni. */
   function stellePer(n, par) {
-    return n <= par ? 3 : n <= par + margine2(par) ? 2 : 1;
+    return n <= par ? 3 : n <= par * 2 ? 2 : 1;
   }
 
   function stelleDi(i) {
