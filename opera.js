@@ -315,9 +315,10 @@
     $('par3').parentNode.classList.toggle('vivo', S.moves <= S.level.par);
     $('par2').parentNode.classList.toggle('vivo',
       S.moves > S.level.par && S.moves <= soglia2(S.level.par));
-    $('levNum').textContent = S.level.n;
     $('btnUndo').disabled = S.history.length === 0 || S.busy;
     $('btnRedo').disabled = S.future.length === 0 || S.busy;
+    /* si abbandona un quadro solo se il seguente e' gia' aperto */
+    $('btnSkip').disabled = S.busy || S.idx >= LEVELS.length - 1 || !aperto(S.idx + 1);
     $('btnReset').disabled = S.moves === 0 || S.busy;
     $('moveCount').parentNode.classList.toggle('perfect', S.moves > 0 && S.moves <= S.level.par);
   }
@@ -508,7 +509,7 @@
     $('figure').classList.remove('won');
     $('figure').style.transition = 'none';
     $('figure').style.transform = 'none';
-    $('levelName').textContent = S.level.name;
+    $('levelName').innerHTML = '<span class="num">' + S.level.n + '</span>' + S.level.name;
     layout();
     buildCells();
     buildControls();
@@ -679,9 +680,8 @@
                         : '3★ ' + lv.par + ' · 2★ ' + soglia2(lv.par))
       : stelleHtml(n) + ' <span class="mosse">' + best + '/' + lv.par + '</span>';
     return '<button class="' + cls + '" data-lv="' + i + '">' +
-             '<span class="lv-top"><span class="num">' + lv.n + '</span>' +
-               miniShape(lv.shape) + '</span>' +
-             '<span class="nm">' + lv.name + '</span>' +
+             '<span class="lv-top">' + miniShape(lv.shape) + '</span>' +
+             '<span class="nm"><span class="num">' + lv.n + '</span>' + lv.name + '</span>' +
              '<span class="st">' + st + '</span>' +
            '</button>';
   }
@@ -782,6 +782,10 @@
     $('btnRedo').onclick = redo;
     $('btnReset').onclick = reset;
     $('btnHint').onclick = hint;
+    $('btnSkip').onclick = function () {
+      if (S.busy || S.idx >= LEVELS.length - 1 || !aperto(S.idx + 1)) return;
+      loadLevel(S.idx + 1);
+    };
     $('btnPreview').onclick = function () {
       store.preview = !store.preview;
       saveStore();

@@ -208,7 +208,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q8', n: 8, act: 1, name: "The Crooked Square", par: 7,
+    id: 'q8', n: 8, act: 1, name: "The Hook", par: 7,
     hint: "",
     cols: 6, rows: 6,
     shape: [[1,0],[1,1],[1,2],[2,2]],
@@ -589,7 +589,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q20', n: 20, act: 2, name: "The Windmill", par: 9,
+    id: 'q20', n: 20, act: 2, name: "The Crank", par: 9,
     hint: "",
     cols: 7, rows: 7,
     shape: [[1,1],[1,2],[1,3],[2,3]],
@@ -1048,7 +1048,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q35', n: 35, act: 4, name: "The Blade", par: 7,
+    id: 'q35', n: 35, act: 4, name: "The Jag", par: 7,
     hint: "",
     cols: 6, rows: 6,
     shape: [[4,2],[5,2],[3,3],[4,3]],
@@ -1082,7 +1082,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q36', n: 36, act: 4, name: "The Rhombus", par: 8,
+    id: 'q36', n: 36, act: 4, name: "Sidelong", par: 8,
     hint: "",
     cols: 7, rows: 7,
     shape: [[2,3],[3,3],[4,3],[3,4]],
@@ -1159,7 +1159,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q38', n: 38, act: 4, name: "The Corner", par: 9,
+    id: 'q38', n: 38, act: 4, name: "The Kink", par: 9,
     hint: "",
     cols: 7, rows: 7,
     shape: [[1,4],[2,4],[0,5],[1,5]],
@@ -1198,7 +1198,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q39', n: 39, act: 4, name: "The Scissors", par: 9,
+    id: 'q39', n: 39, act: 4, name: "Bias", par: 9,
     hint: "",
     cols: 7, rows: 7,
     shape: [[4,1],[4,2],[3,3],[4,3]],
@@ -1741,7 +1741,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q56', n: 56, act: 6, name: "The Double U", par: 9,
+    id: 'q56', n: 56, act: 6, name: "The Cloister", par: 9,
     hint: "",
     cols: 7, rows: 7,
     shape: [[3,1],[4,1],[2,2],[3,2],[3,3]],
@@ -1772,7 +1772,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q57', n: 57, act: 6, name: "Horseshoe", par: 9,
+    id: 'q57', n: 57, act: 6, name: "The Long Corridor", par: 9,
     hint: "",
     cols: 7, rows: 7,
     shape: [[1,3],[1,4],[1,5],[1,6],[2,6]],
@@ -1875,7 +1875,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q60', n: 60, act: 6, name: "The Building Site", par: 11,
+    id: 'q60', n: 60, act: 6, name: "The Double U", par: 11,
     hint: "",
     cols: 8, rows: 8,
     shape: [[1,0],[1,1],[2,1],[2,2],[3,2]],
@@ -1993,7 +1993,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q64', n: 64, act: 7, name: "The Quincunx", par: 7,
+    id: 'q64', n: 64, act: 7, name: "Oblique", par: 7,
     hint: "",
     cols: 6, rows: 6,
     shape: [[4,2],[4,3],[3,4],[4,4]],
@@ -2024,7 +2024,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q65', n: 65, act: 7, name: "Eff", par: 8,
+    id: 'q65', n: 65, act: 7, name: "The Zigzag", par: 8,
     hint: "",
     cols: 7, rows: 7,
     shape: [[4,5],[5,5],[3,6],[4,6]],
@@ -2066,7 +2066,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q66', n: 66, act: 7, name: "En", par: 8,
+    id: 'q66', n: 66, act: 7, name: "The Hammer", par: 8,
     hint: "",
     cols: 7, rows: 7,
     shape: [[2,3],[3,3],[4,3],[3,4]],
@@ -2100,7 +2100,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q67', n: 67, act: 7, name: "Wye", par: 8,
+    id: 'q67', n: 67, act: 7, name: "Eff", par: 8,
     hint: "",
     cols: 7, rows: 7,
     shape: [[5,2],[6,2],[4,3],[5,3],[5,4]],
@@ -2174,7 +2174,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q69', n: 69, act: 7, name: "Athwart", par: 9,
+    id: 'q69', n: 69, act: 7, name: "En", par: 9,
     hint: "",
     cols: 7, rows: 7,
     shape: [[5,0],[4,1],[5,1],[4,2],[4,3]],
@@ -2209,7 +2209,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q70', n: 70, act: 7, name: "The Drift", par: 11,
+    id: 'q70', n: 70, act: 7, name: "Wye", par: 11,
     hint: "",
     cols: 8, rows: 8,
     shape: [[2,2],[1,3],[2,3],[2,4],[2,5]],
@@ -2926,7 +2926,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q92', n: 92, act: 10, name: "The Long Zed", par: 11,
+    id: 'q92', n: 92, act: 10, name: "The Long One", par: 11,
     hint: "The outline is one square smaller: one piece must burn.",
     cols: 7, rows: 7,
     shape: [[4,1],[4,2],[4,3],[4,4],[5,4]],
@@ -2963,7 +2963,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q93', n: 93, act: 10, name: "The Cross", par: 11,
+    id: 'q93', n: 93, act: 10, name: "The Labyrinth", par: 11,
     hint: "",
     cols: 7, rows: 7,
     shape: [[6,2],[5,3],[6,3],[5,4],[5,5]],
@@ -3000,7 +3000,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q94', n: 94, act: 10, name: "The Long One", par: 12,
+    id: 'q94', n: 94, act: 10, name: "The Rose Window", par: 12,
     hint: "The outline is two squares smaller: two pieces must burn.",
     cols: 8, rows: 8,
     shape: [[6,4],[5,5],[6,5],[6,6],[6,7]],
@@ -3044,7 +3044,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q95', n: 95, act: 10, name: "The Labyrinth", par: 12,
+    id: 'q95', n: 95, act: 10, name: "The Long Zed", par: 12,
     hint: "",
     cols: 8, rows: 8,
     shape: [[2,1],[3,1],[3,2],[3,3],[4,3]],
@@ -3091,7 +3091,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q96', n: 96, act: 10, name: "The Spiral", par: 13,
+    id: 'q96', n: 96, act: 10, name: "The Staircase", par: 13,
     hint: "The outline is two squares smaller: two pieces must burn.",
     cols: 8, rows: 8,
     shape: [[2,2],[2,3],[3,3],[3,4],[4,4]],
@@ -3131,7 +3131,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q97', n: 97, act: 10, name: "The Rose Window", par: 13,
+    id: 'q97', n: 97, act: 10, name: "Horseshoe", par: 13,
     hint: "",
     cols: 8, rows: 8,
     shape: [[3,4],[5,4],[3,5],[4,5],[5,5]],
@@ -3181,7 +3181,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q98', n: 98, act: 10, name: "The Contraption", par: 13,
+    id: 'q98', n: 98, act: 10, name: "The Cross", par: 13,
     hint: "The outline is two squares smaller: two pieces must burn.",
     cols: 8, rows: 8,
     shape: [[2,3],[3,3],[4,3],[3,4],[3,5]],

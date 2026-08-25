@@ -185,7 +185,15 @@ piano dei quadri, quindi chi raccoglie **anche una sola stella per quadro va
 sempre avanti**, e chi ne prende tre puo' saltare avanti parecchio. L'ultimo
 quadro chiede 59 stelle sulle 240 possibili.
 
-Le stelle non si salvano: si ricavano da `store.best[id]`, che gia' c'era.
+Le stelle **non si salvano**: si ricavano da `store.best[id]`. E' questa la
+garanzia strutturale che rigiocare non regali stelle in piu' — il totale e' una
+*funzione* del miglior punteggio, non un contatore che si somma. Rifare un
+quadro gia' a tre stelle non ne aggiunge nessuna; rifarne uno da una stella nel
+minimo ne aggiunge **due**, non tre. Verificato.
+
+**Skip** salta al quadro seguente abbandonando quello in corso, ma solo se il
+seguente e' gia' aperto; se no il pulsante e' spento. Il quadro abbandonato non
+risulta chiuso e non da' stelle.
 
 ## I livelli: come sono fatti## I livelli: come sono fatti
 
@@ -269,8 +277,17 @@ plancia del gioco: e' il *materiale* a dire lo stato, non un bordo.
 - carta verde + sagoma chiara + stelle = chiuso (cornice d'oro se nel minimo)
 - niente carta, solo un filo sotto = da aprire
 
-Il nome del quadro e' nel carattere con le grazie del titolo: i riquadri
+Il nome del quadro e' nel carattere con le grazie del titolo, col **numero
+davanti** (`33 The Cut`) invece che in una casella per conto suo: i riquadri
 sembrano opere con il cartellino, non schede di un pannello di controllo.
+
+**I nomi dicono il vero sulla forma.** I nomi che affermano una forma precisa
+— `The Bar`, `The Elbow`, `The Hook`, `The Zed`, `The Trident`, `The False
+Square`, `Eff`, `En`, `Wye`, `The Long One`, `The Long Zed`, `The Double U`,
+`Horseshoe`, `The Cross`, `The Staircase` — stanno **solo** sul quadro che ha
+davvero quella forma; gli altri nomi sono evocativi e non affermano niente. Un
+controllo automatico lo verifica: riconosce la forma dai quadretti (a meno di
+rotazioni e ribaltamenti) e la confronta con quello che il nome promette.
 
 **Cose tolte apposta** (agosto 2026, dopo una ricerca sulle interfacce
 generate a macchina): la **barretta colorata a sinistra** delle schede — il

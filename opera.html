@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta name="description" content="A puzzle of slides, turns and mirrors on a square grid.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%224%22%20fill%3D%22%23e9e3d5%22/%3E%3Cpath%20d%3D%22M5%205h13v9h9v13H14v-9H5z%22%20fill%3D%22%23b03729%22/%3E%3C/svg%3E">
-<link rel="stylesheet" href="opera.css?v=25">
+<link rel="stylesheet" href="opera.css?v=27">
 </head>
 <body>
 
@@ -18,10 +18,9 @@
     <button class="tool" id="btnLevels">Levels</button>
     <h1 id="brand">Opera</h1>
     <div id="score">
-      <div class="pill"><span>Level</span><b id="levNum">1</b></div>
       <div class="pill"><span>Moves</span><b id="moveCount">0</b></div>
-      <div class="pill goal3"><span>3 stars</span><b id="par3">–</b></div>
-      <div class="pill goal2"><span>2 stars</span><b id="par2">–</b></div>
+      <div class="pill goal3"><span class="stelline">★★★</span><b id="par3">–</b></div>
+      <div class="pill goal2"><span class="stelline">★★<i>☆</i></span><b id="par2">–</b></div>
     </div>
   </header>
 
@@ -56,6 +55,7 @@
   <footer id="tools">
     <button class="tool" id="btnReset">Restart</button>
     <button class="tool" id="btnHint">Hint</button>
+    <button class="tool" id="btnSkip" title="Go to the next level, leaving this one">Skip</button>
     <button class="tool toggle" id="btnPreview">Preview</button>
     <button class="tool" id="btnRules">Rules</button>
   </footer>
@@ -102,7 +102,7 @@
       <li>A move that would take the figure off the board can't be made.</li>
       <li>The two arrows under the board <b>undo</b> and <b>redo</b> your moves: you can try things without fear.</li>
       <li>Finishing a level earns one to three <b>stars</b>: three in the fewest moves, two within four times that. Both targets are shown at the top.</li>
-      <li>Stars unlock later levels, so a level you can't crack never blocks your way.</li>
+      <li>Stars unlock later levels, so a level you can't crack never blocks your way. <b>Skip</b> walks away to the next one — as long as that one is already open.</li>
     </ul>
     <p id="crediti">Flame icon by sbed for <a href="https://game-icons.net" target="_blank" rel="noopener">game-icons.net</a> (CC BY 3.0).</p>
     <div class="sheet-foot center">
@@ -111,8 +111,8 @@
   </div>
 </div>
 
-<script src="opera-core.js?v=25"></script>
-<script src="opera-levels.js?v=25"></script>
-<script src="opera.js?v=25"></script>
+<script src="opera-core.js?v=27"></script>
+<script src="opera-levels.js?v=27"></script>
+<script src="opera.js?v=27"></script>
 </body>
 </html>

@@ -88,6 +88,9 @@ body {
   line-height: 1.15;
 }
 .pill span { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); }
+.pill .stelline { font-size: 11px; letter-spacing: .06em; color: var(--gold-soft); }
+.pill .stelline i { font-style: normal; color: #4b5666; }
+.pill.goal3.vivo .stelline, .pill.goal2.vivo .stelline { color: var(--gold); }
 .pill b { font-size: 17px; font-variant-numeric: tabular-nums; }
 .pill.perfect b { color: var(--gold); }
 /* dei due traguardi si accende quello ancora alla portata */
@@ -131,6 +134,11 @@ body {
   margin: 0;
   font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
   font-size: 19px; font-style: italic; color: var(--paper-dim);
+}
+/* il numero sta davanti al titolo, non in una casella per conto suo */
+#levelName .num {
+  font-style: normal; font-size: 14px; color: var(--text-dim);
+  font-variant-numeric: tabular-nums; margin-right: 8px;
 }
 
 #boardWrap { position: relative; }
@@ -450,8 +458,11 @@ body {
 .lv-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
 .lv .num {
   font-size: 11px; color: #8d8471;
-  font-variant-numeric: tabular-nums; letter-spacing: .1em;
+  font-variant-numeric: tabular-nums; letter-spacing: .06em;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  margin-right: 6px;
 }
+.lv-top { min-height: 22px; }
 .lv .mini { width: 22px; height: 22px; display: block; }
 .lv .mini path { fill: var(--figure); }
 .lv .nm {
