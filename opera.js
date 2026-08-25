@@ -132,10 +132,17 @@
     return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cell'));
   }
 
-  function ringsPath(rings, cell) {
-    return rings.map(function (r) {
-      return 'M' + r.map(function (p) { return f(p[0] * cell) + ' ' + f(p[1] * cell); }).join('L') + 'Z';
-    }).join(' ');
+  /* Il contorno si disegna lato per lato invece che incatenando anelli: col
+     fuoco la figura puo' spezzarsi o restare attaccata solo per un angolo, e
+     li' gli anelli non si chiuderebbero. */
+  function edgePath(cells, cell) {
+    var b = C.boundary(cells), out = '', i, e;
+    for (i = 0; i < b.length; i++) {
+      e = b[i];
+      out += 'M' + f(e[0] * cell) + ' ' + f(e[1] * cell) +
+             'L' + f(e[2] * cell) + ' ' + f(e[3] * cell);
+    }
+    return out;
   }
 
   function seamsPath(cells, cell) {
@@ -178,13 +185,13 @@
       '<svg width="' + w + '" height="' + h + '" xmlns="http://www.w3.org/2000/svg">' +
         '<path class="fig-body" d="' + cellsPath(S.cells, cell) + '"/>' +
         '<path class="fig-seam" d="' + seamsPath(S.cells, cell) + '" fill="none"/>' +
-        '<path class="fig-edge" d="' + ringsPath(C.outline(S.cells), cell) + '"/>' +
+        '<path class="fig-edge" d="' + edgePath(S.cells, cell) + '"/>' +
       '</svg>';
   }
 
   function drawMarks() {
     var b = boardSize(), w = b[0], h = b[1], cell = b[2];
-    var dt = ringsPath(C.outline(S.level.target), cell);
+    var dt = edgePath(S.level.target, cell);
     /* due passate: un alone chiaro sotto e le trattine scure sopra. Senza alone
        il tratteggio sparisce dove la figura e' gia' appoggiata sulla sagoma. */
     var parts = '<path class="target-halo" d="' + dt + '"/>' +
@@ -202,7 +209,8 @@
       if (S.ghost.pivot && S.ghost.axis === undefined && S.ghost.spin)
         parts += '<circle class="pivot-dot" cx="' + f((S.ghost.pivot[0] + .5) * cell) +
                  '" cy="' + f((S.ghost.pivot[1] + .5) * cell) + '" r="4"/>';
-      parts += '<path class="ghost-edge" d="' + ringsPath(C.outline(S.ghost.cells), cell) + '"/>';
+      parts += '<path class="ghost-fill" d="' + cellsPath(S.ghost.cells, cell) + '"/>' +
+               '<path class="ghost-edge" d="' + edgePath(S.ghost.cells, cell) + '"/>';
     }
     $('marks').innerHTML =
       '<svg width="' + w + '" height="' + h + '" xmlns="http://www.w3.org/2000/svg">' + parts + '</svg>';
@@ -210,7 +218,7 @@
 
   function buildCells() {
     var lv = S.level, html = '';
-    var walls = C.wallSet(lv), tgt = Object.create(null);
+    var walls = C.wallSet(lv), fuoco = C.fireSet(lv), tgt = Object.create(null);
     lv.target.forEach(function (c) { tgt[c[0] + ',' + c[1]] = true; });
     for (var y = 0; y < lv.rows; y++) for (var x = 0; x < lv.cols; x++) {
       var cls = 'cell';
@@ -218,6 +226,7 @@
       if (y === lv.rows - 1) cls += ' edge-b';
       if (tgt[x + ',' + y]) cls += ' target';
       if (walls[x + ',' + y]) cls += ' wall';
+      if (fuoco[x + ',' + y]) cls += ' fire';
       html += '<div class="' + cls + '"></div>';
     }
     $('cells').innerHTML = html;
@@ -367,6 +376,17 @@
     return tween(fig, transformFor(op, cell), 460);
   }
 
+  /* un guizzo dove il quadretto e' bruciato, per non farlo sparire di soppiatto */
+  function fiammata(celle) {
+    var cell = cellPx(), html = '', i;
+    for (i = 0; i < celle.length; i++)
+      html += '<i class="ember" style="left:' + f(celle[i][0] * cell) + 'px;top:' +
+              f(celle[i][1] * cell) + 'px;width:' + cell + 'px;height:' + cell + 'px"></i>';
+    var l = $('brucia');
+    l.innerHTML = html;
+    setTimeout(function () { if (l.innerHTML === html) l.innerHTML = ''; }, 900);
+  }
+
   function shake() {
     var l = $('figureLayer');
     l.classList.remove('shake');
@@ -392,6 +412,15 @@
       say('A wall is in the way: it cannot pass through, and cannot turn through it either.');
       return;
     }
+    /* il fuoco brucia dove la figura si posa, non dove passa */
+    var fuoco = lv.fire && lv.fire.length ? C.fireSet(lv) : null;
+    var dopo = C.burn(res, fuoco);
+    if (!dopo.length) {
+      shake();
+      say('That move would burn the whole figure away.');
+      return;
+    }
+    var bruciati = res.filter(function (c) { return fuoco && fuoco[c[0] + ',' + c[1]]; });
     S.busy = true;
     S.hintIdx = -1;
     S.ghost = null;
@@ -404,13 +433,14 @@
       fig.style.transform = 'none';
       S.history.push(S.cells);
       S.future.length = 0;      /* una mossa nuova cancella il filo del rifai */
-      S.cells = res;
+      S.cells = dopo;
       S.moves++;
       /* il flag va spento PRIMA di ridisegnare: render() decide da qui se
          annulla e ricomincia sono attivi, e nessuno lo richiama dopo */
       S.busy = false;
       render();
       void fig.offsetWidth;
+      if (bruciati.length) fiammata(bruciati);
       afterMove();
     });
   }

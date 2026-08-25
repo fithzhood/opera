@@ -146,7 +146,19 @@ body {
 }
 
 .layer { position: absolute; inset: 0; }
-#figureLayer, #marks { pointer-events: none; }
+#figureLayer, #marks, #brucia { pointer-events: none; }
+
+/* il guizzo del quadretto che brucia */
+.ember {
+  position: absolute; display: block; border-radius: 3px;
+  background: radial-gradient(circle at 50% 55%, #ffd88a 0 22%, #e8892c 45%, rgba(180,60,18,.5) 72%, transparent 85%);
+  animation: brucia .85s cubic-bezier(.2,0,.3,1) forwards;
+}
+@keyframes brucia {
+  0%   { opacity: 0; transform: scale(.7); }
+  18%  { opacity: 1; transform: scale(1.06); }
+  100% { opacity: 0; transform: scale(.45) translateY(-14%); }
+}
 
 /* piano 1: le caselle */
 
@@ -166,6 +178,13 @@ body {
   background:
     repeating-linear-gradient(45deg, #222a35 0 6px, #1a212b 6px 12px);
   border-color: #2b3441;
+}
+/* il fuoco: brace calda, non un ostacolo — ci si passa, ma chi ci si posa brucia */
+.cell.fire {
+  background:
+    radial-gradient(circle at 50% 60%, rgba(226,118,34,.72) 0 32%, rgba(196,76,20,.42) 56%, rgba(196,76,20,.12) 78%),
+    repeating-linear-gradient(-45deg, rgba(190,78,20,.26) 0 5px, rgba(232,152,58,.18) 5px 10px);
+  border-color: #c08a62;
 }
 
 /* piano 2: la figura */
@@ -244,17 +263,18 @@ body {
 /* piano 4: sagoma d'arrivo e anteprima */
 
 #marks svg { position: absolute; inset: 0; overflow: visible; }
+.ghost-fill { fill: rgba(176,55,41,.14); stroke: none; }
 .target-halo {
   fill: none; stroke: rgba(252,248,238,.92); stroke-width: 7;
-  stroke-dasharray: 9 7; stroke-linejoin: round; stroke-linecap: round;
+  stroke-dasharray: 9 7; stroke-linecap: round;
 }
 .target-edge {
   fill: none; stroke: #6f5312; stroke-width: 3;
-  stroke-dasharray: 9 7; stroke-linejoin: round;
+  stroke-dasharray: 9 7; stroke-linecap: round;
 }
 .ghost-edge {
-  fill: rgba(176,55,41,.14); stroke: var(--figure-hi); stroke-width: 2.5;
-  stroke-dasharray: 5 5; stroke-linejoin: round;
+  fill: none; stroke: var(--figure-hi); stroke-width: 2.5;
+  stroke-dasharray: 5 5; stroke-linecap: round;
 }
 .pivot-dot { fill: var(--gold); }
 

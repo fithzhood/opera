@@ -43,6 +43,27 @@ var OperaCore = (function () {
     return out;
   }
 
+  function cellSet(list) {
+    var s = Object.create(null), i;
+    list = list || [];
+    for (i = 0; i < list.length; i++) s[list[i][0] + ',' + list[i][1]] = true;
+    return s;
+  }
+
+  function fireSet(level) { return cellSet(level.fire); }
+
+  /* Il fuoco brucia il quadretto della figura che si ferma sopra: quello che
+     resta e' la figura meno quei quadretti. Il fuoco non e' un ostacolo — ci si
+     puo' passare sopra e ci si puo' girare attraverso — brucia solo dove la
+     figura si posa. */
+  function burn(cells, fire) {
+    if (!fire) return cells;
+    var out = [], i;
+    for (i = 0; i < cells.length; i++)
+      if (!fire[cells[i][0] + ',' + cells[i][1]]) out.push(cells[i]);
+    return out;
+  }
+
   function wallSet(level) {
     var s = Object.create(null), i, w = level.walls || [];
     for (i = 0; i < w.length; i++) s[w[i][0] + ',' + w[i][1]] = true;
@@ -134,16 +155,22 @@ var OperaCore = (function () {
 
   /* Tutte le mosse giocabili da una posizione: pulsante coperto dalla figura,
      risultato dentro la griglia e nessun muro sulla strada. */
-  function moves(cells, level, walls) {
+  function moves(cells, level, walls, fire) {
     walls = walls || wallSet(level);
-    var out = [], i, b, res, ok, libera;
+    if (fire === undefined) fire = level.fire && level.fire.length ? fireSet(level) : null;
+    var out = [], i, b, res, dopo, ok, libera;
     for (i = 0; i < level.buttons.length; i++) {
       b = level.buttons[i];
       if (!covers(cells, b.x, b.y)) continue;
       res = apply(cells, [b.x, b.y], b.op);
       ok = isLegal(res, level, walls);
       libera = pathClear(cells, [b.x, b.y], b.op, level, walls);
-      out.push({ index: i, button: b, cells: res,
+      dopo = burn(res, fire);
+      /* bruciare tutta la figura non si puo': resterebbe una partita senza
+         niente da muovere e senza uscita */
+      if (!dopo.length) ok = false;
+      out.push({ index: i, button: b, cells: dopo,
+                 brucia: res.length - dopo.length,
                  legal: ok && libera, fuori: !ok, murata: ok && !libera });
     }
     return out;
@@ -160,6 +187,7 @@ var OperaCore = (function () {
     var start = fromCells || level.shape;
     var goal = key(level.target);
     var walls = wallSet(level);
+    var fire = level.fire && level.fire.length ? fireSet(level) : null;
     var startKey = key(start);
     if (startKey === goal) return [];
     var seen = Object.create(null);
@@ -168,7 +196,7 @@ var OperaCore = (function () {
     var head = 0, limit = 400000;
     while (head < queue.length && head < limit) {
       var node = queue[head++];
-      var ms = moves(node.cells, level, walls);
+      var ms = moves(node.cells, level, walls, fire);
       for (var i = 0; i < ms.length; i++) {
         if (!ms[i].legal) continue;
         var k = key(ms[i].cells);
@@ -185,12 +213,13 @@ var OperaCore = (function () {
   /* Quante posizioni distinte sono raggiungibili (serve alla verifica dei livelli). */
   function reachable(level, fromCells) {
     var walls = wallSet(level);
+    var fire = level.fire && level.fire.length ? fireSet(level) : null;
     var start = fromCells || level.shape;
     var seen = Object.create(null);
     seen[key(start)] = true;
     var queue = [start], head = 0;
     while (head < queue.length) {
-      var ms = moves(queue[head++], level, walls);
+      var ms = moves(queue[head++], level, walls, fire);
       for (var i = 0; i < ms.length; i++) {
         if (!ms[i].legal) continue;
         var k = key(ms[i].cells);
@@ -200,6 +229,22 @@ var OperaCore = (function () {
       }
     }
     return Object.keys(seen).length;
+  }
+
+  /* I lati di bordo, uno per uno, senza incatenarli in anelli. Serve perche'
+     col fuoco la figura puo' spezzarsi o toccarsi solo d'angolo, e li' il
+     tracciamento degli anelli si romperebbe (un vertice avrebbe due uscite). */
+  function boundary(cells) {
+    var has = Object.create(null), out = [], i, c, x, y;
+    for (i = 0; i < cells.length; i++) has[cells[i][0] + ',' + cells[i][1]] = true;
+    for (i = 0; i < cells.length; i++) {
+      c = cells[i]; x = c[0]; y = c[1];
+      if (!has[x + ',' + (y - 1)]) out.push([x, y, x + 1, y]);
+      if (!has[(x + 1) + ',' + y]) out.push([x + 1, y, x + 1, y + 1]);
+      if (!has[x + ',' + (y + 1)]) out.push([x + 1, y + 1, x, y + 1]);
+      if (!has[(x - 1) + ',' + y]) out.push([x, y + 1, x, y]);
+    }
+    return out;
   }
 
   /* Contorno esterno di un poliomino: lista di anelli, ognuno un array di
@@ -248,7 +293,8 @@ var OperaCore = (function () {
 
   return {
     key: key, apply: apply, isLegal: isLegal, covers: covers, moves: moves,
-    pathClear: pathClear, spin: spin,
+    pathClear: pathClear, spin: spin, boundary: boundary,
+    fireSet: fireSet, burn: burn,
     solved: solved, solve: solve, reachable: reachable, outline: outline,
     wallSet: wallSet
   };

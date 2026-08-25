@@ -84,7 +84,7 @@ normale. È stato valutato e scartato: si è scelto di restare a multipli di 90�
 
 ## Gli atti e la curva
 
-**80 quadri in 8 atti, dieci per atto.** Ogni atto e' *dedicato* a una
+**100 quadri in 10 atti, dieci per atto.** Ogni atto e' *dedicato* a una
 meccanica: punte, quarto di giro, assi dritti, assi obliqui, mezzo giro, muri,
 passi obliqui, e infine tutto insieme. La tavolozza di un atto e' fatta in gran
 parte della sua meccanica (dal 59% al 100% dei pulsanti, di solito 70–85%) e le
@@ -122,6 +122,36 @@ avesse un **verso diverso** da quello di partenza: senza rotazioni ne'
 simmetrie il verso non puo' cambiare, quindi era una richiesta impossibile.
 `needTurn` ora si spegne da solo quando la tavolozza non contiene niente che
 giri o ribalti.
+
+## Il fuoco
+
+Le caselle ambrate **bruciano il quadretto della figura che ci si ferma sopra**,
+e quel quadretto e' perso per sempre. Il fuoco **non e' un ostacolo**: ci si
+passa sopra e ci si gira attraverso, brucia solo dove la figura si posa. E'
+l'opposto del muro, ed e' voluto.
+
+- **Atto 8, «The Fire»**: l'arrivo ha gli stessi quadretti della partenza,
+  quindi bruciare significa perdere il quadro.
+- **Atto 9, «Burning Down»**: l'arrivo e' *piu' piccolo* della figura, quindi
+  bruciare e' obbligatorio. Nel generatore e' il flag `mustBurn`, che filtra gli
+  arrivi tenendo solo quelli con meno quadretti della partenza.
+- **Atto 10**: si alternano i due casi.
+
+Regole di contorno: la partenza non sta mai sul fuoco, i pulsanti non stanno mai
+sul fuoco, e **una mossa che brucerebbe tutta la figura e' vietata** — resterebbe
+una partita senza niente da muovere.
+
+### La conseguenza tecnica: la figura non e' piu' un corpo intero
+
+Col fuoco la figura puo' **spezzarsi** o restare attaccata solo per un angolo. Il
+contorno disegnato incatenando gli anelli (`outline()`) li' si rompe: in un
+vertice pizzicato ci sono due uscite e la catena prende quella sbagliata. Percio'
+il disegno usa `boundary()`, che restituisce i **lati di bordo uno per uno**,
+senza incatenarli — vale per la figura, per la sagoma d'arrivo e per
+l'anteprima. `outline()` resta nel nucleo ma non serve piu' al gioco.
+
+Il quadretto che brucia non sparisce di soppiatto: una **fiammata** (`.ember`)
+resta un attimo dove stava.
 
 ## Le stelle
 
