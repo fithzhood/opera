@@ -27,6 +27,7 @@
     level: null,
     cells: [],
     history: [],
+    future: [],
     moves: 0,
     busy: false,
     hintIdx: -1,
@@ -295,6 +296,7 @@
     $('parVal').textContent = S.level.par;
     $('levNum').textContent = S.level.n;
     $('btnUndo').disabled = S.history.length === 0 || S.busy;
+    $('btnRedo').disabled = S.future.length === 0 || S.busy;
     $('btnReset').disabled = S.moves === 0 || S.busy;
     $('moveCount').parentNode.classList.toggle('perfect', S.moves > 0 && S.moves <= S.level.par);
   }
@@ -389,6 +391,7 @@
       fig.style.transition = 'none';
       fig.style.transform = 'none';
       S.history.push(S.cells);
+      S.future.length = 0;      /* una mossa nuova cancella il filo del rifai */
       S.cells = res;
       S.moves++;
       /* il flag va spento PRIMA di ridisegnare: render() decide da qui se
@@ -408,9 +411,6 @@
   }
 
   function say(t) { $('hint').textContent = t || ''; }
-
-  /* quante stelle vale una chiusura in n mosse */
-  function stellePer(n, par) { return n <= par ? 3 : n <= par + 2 ? 2 : 1; }
 
   function win() {
     $('figure').classList.add('won');
@@ -446,6 +446,7 @@
     S.level = LEVELS[S.idx];
     S.cells = S.level.shape.slice();
     S.history = [];
+    S.future = [];
     S.moves = 0;
     S.busy = false;
     S.hintIdx = -1;
@@ -465,6 +466,7 @@
 
   function undo() {
     if (S.busy || !S.history.length) return;
+    S.future.push(S.cells);
     S.cells = S.history.pop();
     S.moves = Math.max(0, S.moves - 1);
     S.hintIdx = -1;
@@ -473,10 +475,21 @@
     say(S.level.hint || '');
   }
 
+  function redo() {
+    if (S.busy || !S.future.length) return;
+    S.history.push(S.cells);
+    S.cells = S.future.pop();
+    S.moves++;
+    S.hintIdx = -1;
+    render();
+    afterMove();
+  }
+
   function reset() {
     if (S.busy) return;
     S.cells = S.level.shape.slice();
     S.history = [];
+    S.future = [];
     S.moves = 0;
     S.hintIdx = -1;
     $('figure').classList.remove('won');
@@ -530,12 +543,18 @@
 
   function risolto(i) { return store.best[LEVELS[i].id] !== undefined; }
 
+  /* La fascia delle due stelle cresce col quadro: due mosse di margine su un
+     quadro da 14 sono niente, su uno da 3 sono tante. Almeno tre di margine. */
+  function margine2(par) { return Math.max(3, Math.round(par * 0.5)); }
+
+  function stellePer(n, par) {
+    return n <= par ? 3 : n <= par + margine2(par) ? 2 : 1;
+  }
+
   function stelleDi(i) {
     var lv = LEVELS[i], best = store.best[lv.id];
     if (best === undefined) return 0;
-    if (best <= lv.par) return 3;          /* nel minimo di mosse */
-    if (best <= lv.par + 2) return 2;
-    return 1;
+    return stellePer(best, lv.par);
   }
 
   function stelleTotali() {
@@ -550,11 +569,13 @@
     return (totale === undefined ? stelleTotali() : totale) >= soglia(i);
   }
 
+  /* -1 quando non c'e' piu' niente da fare: se no il segno "da fare" finirebbe
+     sul primo quadro, che pero' e' gia' chiuso, e i due stili si scontrano */
   function primoDaFare() {
     var tot = stelleTotali(), i;
     for (i = 0; i < LEVELS.length; i++) if (aperto(i, tot) && !risolto(i)) return i;
     for (i = 0; i < LEVELS.length; i++) if (!risolto(i)) return i;
-    return 0;
+    return -1;
   }
 
   function stelleHtml(n) {
@@ -599,7 +620,7 @@
     }
     var cls = 'lv';
     if (best !== undefined) cls += n === 3 ? ' done perfect' : ' done';
-    if (i === prossimo) cls += ' next';
+    if (i === prossimo && best === undefined) cls += ' next';
     var st = best === undefined
       ? (i === prossimo ? '<em class="ora">da fare</em> · minimo ' + lv.par : 'minimo ' + lv.par)
       : stelleHtml(n) + ' <span class="mosse">' + best + '/' + lv.par + '</span>';
@@ -661,7 +682,7 @@
     $('btnPlay').textContent = tutti
       ? 'Rigioca il primo'
       : fatti === 0 ? 'Comincia' : 'Riprendi dal quadro ' + LEVELS[prossimo].n;
-    $('btnPlay').dataset.lv = tutti ? 0 : prossimo;
+    $('btnPlay').dataset.lv = prossimo < 0 ? 0 : prossimo;
 
     var segno = $('pickerGrid').querySelector('.lv.next');
     if (segno) setTimeout(function () {
@@ -704,6 +725,7 @@
     });
 
     $('btnUndo').onclick = undo;
+    $('btnRedo').onclick = redo;
     $('btnReset').onclick = reset;
     $('btnHint').onclick = hint;
     $('btnPreview').onclick = function () {
@@ -750,7 +772,8 @@
       if (S.inMenu) return;
       if (e.target.tagName === 'INPUT') return;
       var k = e.key.toLowerCase();
-      if (k === 'z') undo();
+      if (k === 'z') { e.shiftKey ? redo() : undo(); }
+      if (k === 'y') redo();
       if (k === 'r') reset();
       if (k === 'h') hint();
     });

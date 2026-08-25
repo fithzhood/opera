@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta name="description" content="Rompicapo di traslazioni, rotazioni e simmetrie su griglia quadrata.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%224%22%20fill%3D%22%23e9e3d5%22/%3E%3Cpath%20d%3D%22M5%205h13v9h9v13H14v-9H5z%22%20fill%3D%22%23b03729%22/%3E%3C/svg%3E">
-<link rel="stylesheet" href="opera.css?v=17">
+<link rel="stylesheet" href="opera.css?v=19">
 </head>
 <body>
 
@@ -38,7 +38,20 @@
   </main>
 
   <footer id="tools">
-    <button class="tool" id="btnUndo">Annulla</button>
+    <div id="storia">
+      <button class="tool icon" id="btnUndo" title="Annulla (Z)" aria-label="Annulla">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M9 7H14.2a4.8 4.8 0 0 1 0 9.6H9.6"/>
+          <path d="M11.6 4.2 8.4 7l3.2 2.8"/>
+        </svg>
+      </button>
+      <button class="tool icon" id="btnRedo" title="Rifai (Y)" aria-label="Rifai">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 7H9.8a4.8 4.8 0 0 0 0 9.6h4.6"/>
+          <path d="M12.4 4.2 15.6 7l-3.2 2.8"/>
+        </svg>
+      </button>
+    </div>
     <button class="tool" id="btnReset">Ricomincia</button>
     <button class="tool" id="btnHint">Aiuto</button>
     <button class="tool toggle" id="btnPreview">Anteprima</button>
@@ -84,7 +97,8 @@
       <li>L'<b>asse tratteggiato</b> ribalta la figura; l'asse passa per il quadretto premuto e può essere anche obliquo.</li>
       <li>Le caselle scure sono <b>muri</b>: la figura non ci finisce sopra, e non ci passa nemmeno attraverso — nemmeno girando.</li>
       <li>Una mossa che porterebbe la figura fuori dal quadro non si può fare.</li>
-      <li>Chiudere un quadro dà da una a tre <b>stelle</b>: tre se ci riesci nel minimo di mosse. Le stelle aprono i quadri seguenti, così un quadro che non viene non ti blocca la strada.</li>
+      <li>Le due frecce in basso <b>annullano</b> e <b>rifanno</b> le mosse: si può provare senza paura.</li>
+      <li>Chiudere un quadro dà da una a tre <b>stelle</b>: tre se ci riesci nel minimo di mosse, due se ci vai vicino. Le stelle aprono i quadri seguenti, così un quadro che non viene non ti blocca la strada.</li>
     </ul>
     <div class="sheet-foot center">
       <button class="tool primary" id="btnCloseHowto">Ho capito</button>
@@ -92,8 +106,8 @@
   </div>
 </div>
 
-<script src="opera-core.js?v=17"></script>
-<script src="opera-levels.js?v=17"></script>
-<script src="opera.js?v=17"></script>
+<script src="opera-core.js?v=19"></script>
+<script src="opera-levels.js?v=19"></script>
+<script src="opera.js?v=19"></script>
 </body>
 </html>

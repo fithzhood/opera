@@ -35,6 +35,9 @@
 
 html, body {
   margin: 0; height: 100%;
+  /* niente selezione del testo: e' un gioco, non un documento da copiare */
+  -webkit-user-select: none; user-select: none;
+  -webkit-touch-callout: none;
   background: var(--ink);
   color: var(--text);
   font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
@@ -257,7 +260,19 @@ body {
   max-width: 560px;
 }
 
-#tools { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+#tools { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; align-items: center; }
+
+/* annulla e rifai: le due frecce classiche, staccate dal resto e piu' grandi,
+   perche' in un rompicapo sono i comandi che si usano di piu' */
+#storia { display: flex; gap: 6px; padding-right: 10px; margin-right: 2px; border-right: 1px solid var(--ink-line); }
+.tool.icon { padding: 6px 12px; display: grid; place-items: center; }
+.tool.icon svg {
+  width: 22px; height: 22px; display: block;
+  fill: none; stroke: currentColor; stroke-width: 2.1;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.tool.icon:not(:disabled) { color: var(--paper-dim); border-color: #3a4757; }
+.tool.icon:not(:disabled):hover { color: var(--gold); border-color: var(--gold-soft); }
 
 /* ---------- pannelli ---------- */
 
@@ -373,97 +388,89 @@ body {
   gap: 8px;
 }
 
-/* ---- un quadro ---- */
+/* ---- un quadro ----
+   I riquadri sono fogli di carta appoggiati sul fondo scuro, come la plancia
+   del gioco: e' il materiale a dire lo stato, non un bordo o una barretta.
+   Carta chiara = da fare. Carta verde = chiuso. Niente carta = da aprire. */
 
-/* Aperto e da aprire devono distinguersi da lontano, non a forza di guardare:
-   il quadro aperto e' un riquadro rilevato e illuminato, quello da aprire e'
-   quasi trasparente sul fondo, senza nome e senza sagoma. */
 .lv {
   position: relative;
-  display: flex; flex-direction: column; gap: 5px;
+  display: flex; flex-direction: column; gap: 3px;
   text-align: left; font: inherit;
-  background: linear-gradient(180deg, #1f2937, #161f2b);
-  color: var(--text);
-  border: 1px solid #43536a; border-radius: 10px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 2px 6px rgba(0,0,0,.35);
-  padding: 9px 10px 8px;
+  background: var(--paper-dim);
+  color: #2b2318;
+  border: 0; border-radius: 4px;
+  padding: 9px 11px 8px;
+  box-shadow: 0 1px 0 rgba(0,0,0,.4), 0 6px 14px rgba(0,0,0,.30);
   cursor: pointer;
-  transition: border-color .15s, background .15s, transform .12s, box-shadow .15s;
+  transition: transform .13s cubic-bezier(.3,0,.2,1), box-shadow .15s, background .15s;
 }
 .lv:hover {
-  background: linear-gradient(180deg, #283548, #1d2735);
-  border-color: #6a809b; transform: translateY(-1px);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.09), 0 6px 14px rgba(0,0,0,.45);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 0 rgba(0,0,0,.4), 0 12px 24px rgba(0,0,0,.42);
+  background: var(--paper);
 }
 .lv:active { transform: translateY(0); }
 
 .lv-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
 .lv .num {
-  font-size: 11px; color: var(--text-dim);
-  font-variant-numeric: tabular-nums; letter-spacing: .08em;
+  font-size: 11px; color: #8d8471;
+  font-variant-numeric: tabular-nums; letter-spacing: .1em;
 }
-.lv .mini { width: 21px; height: 21px; display: block; opacity: .9; }
+.lv .mini { width: 22px; height: 22px; display: block; }
 .lv .mini path { fill: var(--figure); }
-.lv .nm { font-size: 13px; line-height: 1.25; }
+.lv .nm {
+  font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  font-size: 14px; line-height: 1.2; color: #241d13;
+}
 .lv .st {
-  font-size: 11px; color: var(--text-dim);
+  font-size: 11px; color: #6e6553;
   font-variant-numeric: tabular-nums;
-  display: flex; align-items: baseline; gap: 2px;
+  display: flex; align-items: baseline; gap: 3px;
 }
-/* da fare: la riga dice solo il minimo, e resta smorzata */
-.lv:not(.done):not(.locked) .st { color: #7d8899; }
 .lv .st em { font-style: normal; }
-.lv .stelle { color: var(--gold); letter-spacing: .08em; font-size: 13px; }
-.lv .stelle i { color: #46505f; font-style: normal; }
-.lv .st .mosse { color: var(--text-dim); margin-left: 4px; }
+.lv .stelle { color: #9a7420; letter-spacing: .1em; font-size: 13px; }
+.lv .stelle i { color: rgba(0,0,0,.22); font-style: normal; }
+.lv .st .mosse { color: #7d7360; }
 
-/* Chiuso e da fare non si distinguono con un bordo: si distinguono col fondo e
-   con la sagoma, che usa la stessa lingua del gioco — rossa finche' e' da fare,
-   verde quando e' a posto. */
-.lv.done {
-  background: linear-gradient(180deg, #1b2c23, #15211b);
-  border-color: #3f6a53;
-}
-.lv.done::before {
-  content: ""; position: absolute;
-  left: 0; top: 9px; bottom: 9px; width: 3px;
-  border-radius: 0 3px 3px 0;
-  background: #4a8763;
-}
-.lv.done:hover { background: linear-gradient(180deg, #23392e, #1a2a22); border-color: #61997a; }
-.lv.done .mini path { fill: var(--figure-ok); }
-.lv.done .st { color: #8dae8d; }
+/* chiuso: la carta si e' tinta di verde, come la figura quando va a posto */
+.lv.done { background: #2f5741; color: #e6eee6; }
+.lv.done:hover { background: #38664d; }
+.lv.done .num { color: #93b7a0; }
+.lv.done .nm { color: #eef3ec; }
+.lv.done .mini path { fill: #d8e6d6; }
+.lv.done .st { color: #b3cebc; }
+.lv.done .stelle { color: var(--gold); }
+.lv.done .stelle i { color: rgba(255,255,255,.22); }
+.lv.done .st .mosse { color: #a6c2ae; }
 
-/* chiuso nel minimo: stesso verde ma acceso, e le stelle d'oro */
-.lv.perfect { background: linear-gradient(180deg, #21382b, #182a20); border-color: #58966e; }
-.lv.perfect::before { background: #6fbd8c; }
-.lv.perfect:hover { background: linear-gradient(180deg, #2a4536, #1f3327); border-color: #7dbb95; }
-.lv.perfect .st { color: var(--gold); }
+/* chiuso nel minimo: la stessa carta con la cornice d'oro */
+.lv.perfect { box-shadow: 0 0 0 1.5px var(--gold), 0 1px 0 rgba(0,0,0,.4), 0 6px 14px rgba(0,0,0,.30); }
+.lv.perfect:hover { box-shadow: 0 0 0 1.5px var(--gold), 0 2px 0 rgba(0,0,0,.4), 0 12px 24px rgba(0,0,0,.42); }
 
-/* il quadro da fare: un anello d'oro e un alone appena accennato */
-.lv.next {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 1px rgba(211,163,74,.35), 0 6px 18px rgba(211,163,74,.10);
-}
-.lv .st em.ora {
-  color: var(--gold); font-style: normal;
-  letter-spacing: .04em;
-}
+/* il prossimo da fare: la carta e' piu' bianca e c'e' un filo d'inchiostro attorno */
+.lv.next { background: var(--paper); box-shadow: 0 0 0 2px var(--gold), 0 6px 16px rgba(0,0,0,.34); }
+/* per sicurezza: se mai i due stati si sovrapponessero, vince il verde del chiuso */
+.lv.done.next { background: #2f5741; }
+.lv.next:hover { box-shadow: 0 0 0 2px var(--gold), 0 12px 24px rgba(0,0,0,.44); }
+.lv.next .st em.ora { color: #8a6a26; font-weight: 600; }
 
-/* da aprire: niente nome, solo il numero e il lucchetto */
+/* da aprire: la carta non c'e' ancora, resta solo il posto vuoto */
 .lv.locked {
   cursor: default;
-  background: transparent;
-  border: 1px dashed #212a36;
-  box-shadow: none;
-  color: var(--text-dim);
-  opacity: .42;
+  background: none; box-shadow: none;
+  border-bottom: 1px solid #1e2734;
+  border-radius: 0;
+  padding: 10px 2px 9px;
+  color: #4e5a6d;
+  justify-content: flex-start;
 }
-.lv.locked .num { color: #3f4959; }
-.lv.locked .lock { width: 15px; height: 15px; display: block; fill: #3f4959; stroke: #3f4959; }
-.lv.locked .st { color: #56627a; }
-/* il primo che si aprira': si fa notare appena, cosi' si vede dove si arriva */
-.lv.locked.vicino { opacity: .62; border-color: #33404f; }
+.lv.locked .num { color: #414c5d; }
+.lv.locked .lock { width: 14px; height: 14px; display: block; fill: #414c5d; stroke: #414c5d; }
+.lv.locked .st { color: #55617a; }
+.lv.locked.vicino { border-bottom-color: #3a4152; }
+.lv.locked.vicino .num { color: #6b7688; }
+.lv.locked.vicino .lock { fill: #6b7688; stroke: #6b7688; }
 .lv.locked.vicino .st { color: var(--gold-soft); }
 
 #menuFoot { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
@@ -535,6 +542,9 @@ body.capacitor { --sa-t: max(env(safe-area-inset-top, 0px), 34px); }
     flex-wrap: nowrap; gap: 5px; overflow-y: auto;
   }
   #tools .tool { padding: 6px 8px; font-size: 12px; }
+  #storia { padding: 0 0 6px; margin: 0 0 2px; border-right: 0; border-bottom: 1px solid var(--ink-line); justify-content: center; }
+  #tools .tool.icon { padding: 5px 10px; }
+  #tools .tool.icon svg { width: 19px; height: 19px; }
   #hint { font-size: 11px; text-align: left; min-height: 0; margin-top: 4px; max-width: none; }
   #stage { grid-area: stage; gap: 0; }
   .sheet { padding: 16px 18px; max-height: 92vh; }

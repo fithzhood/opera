@@ -58,6 +58,12 @@ impossibile.
 opposte. Con `Math.floor(v + 0.5 + 1e-9)` la regola è reversibile — verificato
 su 5172 combinazioni di forma, perno, verso e posizione del muro.
 
+**Una passata di sfoltimento** toglie qualche pulsante che non serve: uno alla
+volta, tenendolo via solo se il minimo di mosse non cambia e restano abbastanza
+scelte, fino a un quinto dei pulsanti. Serve a ridurre il rumore senza smontare
+il rompicapo — nell'ultima passata sono spariti il 18% dei pulsanti, con la
+curva del par identica.
+
 **I muri li sceglie il generatore**, non io: messi negli angoli non frenerebbero
 mai niente e la regola resterebbe invisibile. La ricerca li piazza lontano dal
 bordo e scarta i quadri in cui un muro taglia la strada in meno del 14% delle
@@ -120,7 +126,8 @@ giri o ribalti.
 ## Le stelle
 
 Chiudere un quadro vale **da una a tre stelle**: tre nel minimo di mosse, due
-entro due mosse in piu', una comunque. Per entrare in un quadro serve un totale
+entro un margine che **cresce col quadro** (`max(3, par/2)` mosse in piu' — su
+un quadro da 14 sono sette, su uno da 3 sono tre), una comunque. Per entrare in un quadro serve un totale
 di stelle — **non** aver chiuso quello prima. Cosi' un quadro che non viene non
 blocca la strada.
 
@@ -197,6 +204,29 @@ asse o un verso di rotazione sono sbagliati, cosa che a occhio non si vede.
 Attenzione: nel pannello di anteprima nascosto i timer vengono strozzati a ~1s,
 quindi le prove che campionano a metà animazione non funzionano. Si aspetta uno
 stato (il contatore delle mosse che cambia), non un tempo.
+
+## L'estetica del menu
+
+I riquadri dei quadri sono **fogli di carta** appoggiati sul fondo scuro, come la
+plancia del gioco: e' il *materiale* a dire lo stato, non un bordo.
+
+- carta chiara + sagoma rossa = da fare
+- carta verde + sagoma chiara + stelle = chiuso (cornice d'oro se nel minimo)
+- niente carta, solo un filo sotto = da aprire
+
+Il nome del quadro e' nel carattere con le grazie del titolo: i riquadri
+sembrano opere con il cartellino, non schede di un pannello di controllo.
+
+**Cose tolte apposta** (agosto 2026, dopo una ricerca sulle interfacce
+generate a macchina): la **barretta colorata a sinistra** delle schede — il
+segnale piu' riconoscibile di interfaccia fatta a macchina, l'utente l'aveva
+notata da solo — i gradienti sulle schede, i riflessi «vetrosi» in alto, le
+ombre morbide su tutto. Al loro posto: fondi pieni, un'ombra sola che regge il
+foglio, angoli appena smussati.
+
+Il testo **non e' selezionabile** (`user-select: none` su `html, body`): vale
+per tutte le app dell'utente tranne quelle per scrivere. Vedi la memoria
+`testo-non-selezionabile`.
 
 ## Due scelte di disegno che sembrano dettagli
 
