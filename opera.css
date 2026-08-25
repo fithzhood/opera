@@ -408,19 +408,37 @@ body {
 .lv .st {
   font-size: 11px; color: var(--text-dim);
   font-variant-numeric: tabular-nums;
+  display: flex; align-items: baseline; gap: 2px;
 }
+/* da fare: la riga dice solo il minimo, e resta smorzata */
+.lv:not(.done):not(.locked) .st { color: #7d8899; }
 .lv .st em { font-style: normal; }
-.lv .stelle { color: var(--gold); letter-spacing: .06em; }
+.lv .stelle { color: var(--gold); letter-spacing: .08em; font-size: 13px; }
 .lv .stelle i { color: #46505f; font-style: normal; }
 .lv .st .mosse { color: var(--text-dim); margin-left: 4px; }
 
-/* i chiusi non devono spegnersi: restano riquadri accesi, con il bordo
-   che vira al verde (e all'oro se presi nel minimo) */
-.lv.done { border-color: #4d6a58; }
-.lv.perfect { border-color: #7a6634; }
-.lv.done .st { color: #82a382; }
+/* Chiuso e da fare non si distinguono con un bordo: si distinguono col fondo e
+   con la sagoma, che usa la stessa lingua del gioco — rossa finche' e' da fare,
+   verde quando e' a posto. */
+.lv.done {
+  background: linear-gradient(180deg, #1b2c23, #15211b);
+  border-color: #3f6a53;
+}
+.lv.done::before {
+  content: ""; position: absolute;
+  left: 0; top: 9px; bottom: 9px; width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: #4a8763;
+}
+.lv.done:hover { background: linear-gradient(180deg, #23392e, #1a2a22); border-color: #61997a; }
+.lv.done .mini path { fill: var(--figure-ok); }
+.lv.done .st { color: #8dae8d; }
+
+/* chiuso nel minimo: stesso verde ma acceso, e le stelle d'oro */
+.lv.perfect { background: linear-gradient(180deg, #21382b, #182a20); border-color: #58966e; }
+.lv.perfect::before { background: #6fbd8c; }
+.lv.perfect:hover { background: linear-gradient(180deg, #2a4536, #1f3327); border-color: #7dbb95; }
 .lv.perfect .st { color: var(--gold); }
-.lv.perfect .mini path { fill: var(--figure-ok); }
 
 /* il quadro da fare: un anello d'oro e un alone appena accennato */
 .lv.next {
