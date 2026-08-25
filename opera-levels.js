@@ -18,7 +18,7 @@ var OPERA_ACTS = [
 
 var OPERA_LEVELS = [
   {
-    id: 'q1', n: 1, act: 1, name: "Primo passo", par: 3,
+    id: 'q1', n: 1, act: 1, name: "First Step", par: 3,
     hint: "The arrowheads move the figure. A square only works while the figure stands on it.",
     cols: 4, rows: 4,
     shape: [[1,0],[2,0]],
@@ -38,7 +38,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q2', n: 2, act: 1, name: "Due caselle", par: 4,
+    id: 'q2', n: 2, act: 1, name: "Two Squares", par: 4,
     hint: "The number of arrowheads tells you how many squares it moves.",
     cols: 5, rows: 5,
     shape: [[1,3],[2,3]],
@@ -63,7 +63,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q3', n: 3, act: 1, name: "La rincorsa", par: 4,
+    id: 'q3', n: 3, act: 1, name: "The Run-Up", par: 4,
     hint: "",
     cols: 5, rows: 5,
     shape: [[1,3],[2,3]],
@@ -90,7 +90,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q4', n: 4, act: 1, name: "La stecca", par: 5,
+    id: 'q4', n: 4, act: 1, name: "The Bar", par: 5,
     hint: "",
     cols: 5, rows: 5,
     shape: [[0,1],[1,1],[2,1]],
@@ -118,7 +118,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q5', n: 5, act: 1, name: "Il gomito", par: 5,
+    id: 'q5', n: 5, act: 1, name: "The Elbow", par: 5,
     hint: "",
     cols: 5, rows: 5,
     shape: [[2,1],[3,1],[3,2]],
@@ -145,7 +145,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q6', n: 6, act: 1, name: "Il passo lungo", par: 6,
+    id: 'q6', n: 6, act: 1, name: "The Long Stride", par: 6,
     hint: "",
     cols: 6, rows: 6,
     shape: [[2,2],[3,2],[4,2]],
@@ -177,7 +177,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q7', n: 7, act: 1, name: "Andirivieni", par: 6,
+    id: 'q7', n: 7, act: 1, name: "Back and Forth", par: 6,
     hint: "",
     cols: 6, rows: 6,
     shape: [[2,3],[3,3],[3,4]],
@@ -208,7 +208,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q8', n: 8, act: 1, name: "Il quadrato storto", par: 7,
+    id: 'q8', n: 8, act: 1, name: "The Crooked Square", par: 7,
     hint: "",
     cols: 6, rows: 6,
     shape: [[1,0],[1,1],[1,2],[2,2]],
@@ -239,7 +239,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q9', n: 9, act: 1, name: "La zeta", par: 7,
+    id: 'q9', n: 9, act: 1, name: "The Zed", par: 7,
     hint: "",
     cols: 7, rows: 7,
     shape: [[5,1],[6,1],[4,2],[5,2]],
@@ -282,7 +282,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q10', n: 10, act: 1, name: "Il tridente", par: 8,
+    id: 'q10', n: 10, act: 1, name: "The Trident", par: 8,
     hint: "",
     cols: 7, rows: 7,
     shape: [[1,1],[2,1],[3,1],[2,2]],
@@ -319,7 +319,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q11', n: 11, act: 2, name: "Un quarto di giro", par: 4,
+    id: 'q11', n: 11, act: 2, name: "A Quarter Turn", par: 4,
     hint: "The curved arrow turns the figure a quarter turn around the square you press.",
     cols: 5, rows: 5,
     shape: [[0,2],[1,2]],
@@ -341,7 +341,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q12', n: 12, act: 2, name: "Il cardine", par: 5,
+    id: 'q12', n: 12, act: 2, name: "The Hinge", par: 5,
     hint: "The pivot is always the square you press: choosing it well changes everything.",
     cols: 5, rows: 5,
     shape: [[1,2],[2,2]],
@@ -360,7 +360,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q13', n: 13, act: 2, name: "Il perno giusto", par: 5,
+    id: 'q13', n: 13, act: 2, name: "The Right Pivot", par: 5,
     hint: "",
     cols: 5, rows: 5,
     shape: [[2,3],[3,3],[4,3]],
@@ -385,7 +385,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q14', n: 14, act: 2, name: "La virata", par: 6,
+    id: 'q14', n: 14, act: 2, name: "The Veer", par: 6,
     hint: "",
     cols: 5, rows: 5,
     shape: [[0,3],[1,3],[1,4]],
@@ -412,7 +412,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q15', n: 15, act: 2, name: "Il ripiego", par: 6,
+    id: 'q15', n: 15, act: 2, name: "The Retreat", par: 6,
     hint: "",
     cols: 6, rows: 6,
     shape: [[0,3],[1,3],[1,4]],
@@ -481,7 +481,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q17', n: 17, act: 2, name: "La chiave", par: 7,
+    id: 'q17', n: 17, act: 2, name: "The Key", par: 7,
     hint: "",
     cols: 6, rows: 6,
     shape: [[2,3],[2,4],[1,5],[2,5]],
@@ -520,7 +520,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q18', n: 18, act: 2, name: "La giravolta", par: 8,
+    id: 'q18', n: 18, act: 2, name: "The Pirouette", par: 8,
     hint: "",
     cols: 6, rows: 6,
     shape: [[2,0],[3,0],[1,1],[2,1]],
@@ -552,7 +552,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q19', n: 19, act: 2, name: "La bandiera", par: 8,
+    id: 'q19', n: 19, act: 2, name: "The Flag", par: 8,
     hint: "",
     cols: 7, rows: 7,
     shape: [[0,0],[1,0],[2,0],[1,1]],
@@ -589,7 +589,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q20', n: 20, act: 2, name: "Il mulino", par: 9,
+    id: 'q20', n: 20, act: 2, name: "The Windmill", par: 9,
     hint: "",
     cols: 7, rows: 7,
     shape: [[1,1],[1,2],[1,3],[2,3]],
@@ -631,7 +631,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q21', n: 21, act: 3, name: "Lo specchio", par: 5,
+    id: 'q21', n: 21, act: 3, name: "The Mirror", par: 5,
     hint: "The dashed axis flips the figure, and it runs through the square you press.",
     cols: 5, rows: 5,
     shape: [[3,2],[4,2],[4,3]],
@@ -651,7 +651,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q22', n: 22, act: 3, name: "Il riflesso", par: 5,
+    id: 'q22', n: 22, act: 3, name: "The Reflection", par: 5,
     hint: "",
     cols: 5, rows: 5,
     shape: [[1,2],[2,2],[2,3]],
@@ -679,7 +679,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q23', n: 23, act: 3, name: "Due specchi", par: 6,
+    id: 'q23', n: 23, act: 3, name: "Two Mirrors", par: 6,
     hint: "",
     cols: 6, rows: 6,
     shape: [[2,3],[3,3],[4,3]],
@@ -708,7 +708,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q24', n: 24, act: 3, name: "Il ribaltone", par: 6,
+    id: 'q24', n: 24, act: 3, name: "The Upset", par: 6,
     hint: "",
     cols: 6, rows: 6,
     shape: [[3,1],[4,1],[4,2]],
@@ -732,7 +732,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q25', n: 25, act: 3, name: "Il paravento", par: 7,
+    id: 'q25', n: 25, act: 3, name: "The Folding Screen", par: 7,
     hint: "",
     cols: 6, rows: 6,
     shape: [[2,0],[2,1],[2,2],[3,2]],
@@ -767,7 +767,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q26', n: 26, act: 3, name: "La cerniera", par: 7,
+    id: 'q26', n: 26, act: 3, name: "The Seam", par: 7,
     hint: "",
     cols: 6, rows: 6,
     shape: [[3,1],[3,2],[2,3],[3,3]],
@@ -798,7 +798,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q27', n: 27, act: 3, name: "Il sosia", par: 8,
+    id: 'q27', n: 27, act: 3, name: "The Double", par: 8,
     hint: "",
     cols: 7, rows: 7,
     shape: [[3,2],[4,2],[2,3],[3,3]],
@@ -833,7 +833,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q28', n: 28, act: 3, name: "Controluce", par: 8,
+    id: 'q28', n: 28, act: 3, name: "Backlit", par: 8,
     hint: "",
     cols: 7, rows: 7,
     shape: [[0,5],[1,5],[2,5],[1,6]],
@@ -861,7 +861,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q29', n: 29, act: 3, name: "Il dittico", par: 9,
+    id: 'q29', n: 29, act: 3, name: "The Diptych", par: 9,
     hint: "",
     cols: 7, rows: 7,
     shape: [[4,3],[4,4],[4,5],[5,5]],
@@ -902,7 +902,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q30', n: 30, act: 3, name: "La piega", par: 9,
+    id: 'q30', n: 30, act: 3, name: "The Fold", par: 9,
     hint: "",
     cols: 7, rows: 7,
     shape: [[4,4],[4,5],[3,6],[4,6]],
@@ -935,7 +935,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q31', n: 31, act: 4, name: "Di sbieco", par: 5,
+    id: 'q31', n: 31, act: 4, name: "Askew", par: 5,
     hint: "Axes can be slanted too, at 45 degrees.",
     cols: 5, rows: 5,
     shape: [[1,2],[2,2],[2,3]],
@@ -958,7 +958,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q32', n: 32, act: 4, name: "La diagonale", par: 6,
+    id: 'q32', n: 32, act: 4, name: "The Diagonal", par: 6,
     hint: "",
     cols: 6, rows: 6,
     shape: [[2,4],[3,4],[3,5]],
@@ -983,7 +983,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q33', n: 33, act: 4, name: "Il taglio", par: 6,
+    id: 'q33', n: 33, act: 4, name: "The Cut", par: 6,
     hint: "",
     cols: 6, rows: 6,
     shape: [[4,0],[4,1],[4,2],[5,2]],
@@ -1018,7 +1018,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q34', n: 34, act: 4, name: "Sghembo", par: 7,
+    id: 'q34', n: 34, act: 4, name: "Skew", par: 7,
     hint: "",
     cols: 6, rows: 6,
     shape: [[2,1],[2,2],[1,3],[2,3]],
@@ -1048,7 +1048,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q35', n: 35, act: 4, name: "La lama", par: 7,
+    id: 'q35', n: 35, act: 4, name: "The Blade", par: 7,
     hint: "",
     cols: 6, rows: 6,
     shape: [[4,2],[5,2],[3,3],[4,3]],
@@ -1082,7 +1082,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q36', n: 36, act: 4, name: "Il rombo", par: 8,
+    id: 'q36', n: 36, act: 4, name: "The Rhombus", par: 8,
     hint: "",
     cols: 7, rows: 7,
     shape: [[2,3],[3,3],[4,3],[3,4]],
@@ -1118,7 +1118,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q37', n: 37, act: 4, name: "Trasversale", par: 8,
+    id: 'q37', n: 37, act: 4, name: "Crosswise", par: 8,
     hint: "",
     cols: 7, rows: 7,
     shape: [[2,0],[2,1],[2,2],[3,2]],
@@ -1159,7 +1159,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q38', n: 38, act: 4, name: "Lo spigolo", par: 9,
+    id: 'q38', n: 38, act: 4, name: "The Corner", par: 9,
     hint: "",
     cols: 7, rows: 7,
     shape: [[1,4],[2,4],[0,5],[1,5]],
@@ -1198,7 +1198,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q39', n: 39, act: 4, name: "La forbice", par: 9,
+    id: 'q39', n: 39, act: 4, name: "The Scissors", par: 9,
     hint: "",
     cols: 7, rows: 7,
     shape: [[4,1],[4,2],[3,3],[4,3]],
@@ -1240,7 +1240,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q40', n: 40, act: 4, name: "Il ventaglio", par: 10,
+    id: 'q40', n: 40, act: 4, name: "The Fan", par: 10,
     hint: "",
     cols: 7, rows: 7,
     shape: [[0,4],[1,4],[2,4],[1,5]],
@@ -1275,7 +1275,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q41', n: 41, act: 5, name: "Il mezzo giro", par: 5,
+    id: 'q41', n: 41, act: 5, name: "The Half Turn", par: 5,
     hint: "The arc with two heads makes a half turn in one go.",
     cols: 5, rows: 5,
     shape: [[1,1],[2,1],[2,2]],
@@ -1299,7 +1299,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q42', n: 42, act: 5, name: "Testa e coda", par: 6,
+    id: 'q42', n: 42, act: 5, name: "Head and Tail", par: 6,
     hint: "",
     cols: 6, rows: 6,
     shape: [[2,1],[2,2],[2,3],[3,3]],
@@ -1327,7 +1327,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q43', n: 43, act: 5, name: "Il rovescio", par: 7,
+    id: 'q43', n: 43, act: 5, name: "The Reverse", par: 7,
     hint: "",
     cols: 6, rows: 6,
     shape: [[4,2],[4,3],[3,4],[4,4]],
@@ -1358,7 +1358,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q44', n: 44, act: 5, name: "La capriola", par: 7,
+    id: 'q44', n: 44, act: 5, name: "The Somersault", par: 7,
     hint: "",
     cols: 6, rows: 6,
     shape: [[4,3],[5,3],[3,4],[4,4]],
@@ -1390,7 +1390,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q45', n: 45, act: 5, name: "La girandola", par: 8,
+    id: 'q45', n: 45, act: 5, name: "The Pinwheel", par: 8,
     hint: "",
     cols: 6, rows: 6,
     shape: [[3,3],[4,3],[5,3],[4,4]],
@@ -1424,7 +1424,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q46', n: 46, act: 5, name: "Il quadrato falso", par: 8,
+    id: 'q46', n: 46, act: 5, name: "The False Square", par: 8,
     hint: "",
     cols: 6, rows: 6,
     shape: [[3,1],[4,1],[3,2],[4,2]],
@@ -1456,7 +1456,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q47', n: 47, act: 5, name: "Sottosopra", par: 9,
+    id: 'q47', n: 47, act: 5, name: "Upside Down", par: 9,
     hint: "",
     cols: 7, rows: 7,
     shape: [[1,2],[1,3],[1,4],[2,4]],
@@ -1495,7 +1495,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q48', n: 48, act: 5, name: "Il contrappasso", par: 9,
+    id: 'q48', n: 48, act: 5, name: "The Counterturn", par: 9,
     hint: "",
     cols: 7, rows: 7,
     shape: [[3,0],[3,1],[2,2],[3,2]],
@@ -1534,7 +1534,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q49', n: 49, act: 5, name: "La bussola", par: 10,
+    id: 'q49', n: 49, act: 5, name: "The Compass", par: 10,
     hint: "",
     cols: 7, rows: 7,
     shape: [[4,1],[5,1],[3,2],[4,2]],
@@ -1577,7 +1577,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q50', n: 50, act: 5, name: "Il perno lungo", par: 10,
+    id: 'q50', n: 50, act: 5, name: "The Long Pivot", par: 10,
     hint: "",
     cols: 7, rows: 7,
     shape: [[1,2],[2,2],[3,2],[2,3]],
@@ -1604,7 +1604,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q51', n: 51, act: 6, name: "Il primo muro", par: 5,
+    id: 'q51', n: 51, act: 6, name: "The First Wall", par: 5,
     hint: "Dark squares are walls: the figure can't land on them, and can't turn through them either.",
     cols: 5, rows: 5,
     shape: [[0,3],[1,3],[1,4]],
@@ -1627,7 +1627,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q52', n: 52, act: 6, name: "Lo stretto", par: 6,
+    id: 'q52', n: 52, act: 6, name: "The Narrows", par: 6,
     hint: "",
     cols: 6, rows: 6,
     shape: [[3,1],[3,2],[3,3],[4,3]],
@@ -1654,7 +1654,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q53', n: 53, act: 6, name: "La colonna", par: 7,
+    id: 'q53', n: 53, act: 6, name: "The Column", par: 7,
     hint: "",
     cols: 6, rows: 6,
     shape: [[1,2],[1,3],[0,4],[1,4]],
@@ -1680,7 +1680,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q54', n: 54, act: 6, name: "Il varco", par: 7,
+    id: 'q54', n: 54, act: 6, name: "The Gap", par: 7,
     hint: "",
     cols: 6, rows: 6,
     shape: [[4,1],[5,1],[3,2],[4,2]],
@@ -1706,7 +1706,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q55', n: 55, act: 6, name: "Il vicolo", par: 8,
+    id: 'q55', n: 55, act: 6, name: "The Alley", par: 8,
     hint: "",
     cols: 7, rows: 7,
     shape: [[1,0],[2,0],[3,0],[2,1]],
@@ -1741,7 +1741,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q56', n: 56, act: 6, name: "La doppia vu", par: 9,
+    id: 'q56', n: 56, act: 6, name: "The Double U", par: 9,
     hint: "",
     cols: 7, rows: 7,
     shape: [[3,1],[4,1],[2,2],[3,2],[3,3]],
@@ -1772,7 +1772,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q57', n: 57, act: 6, name: "Ferro di cavallo", par: 9,
+    id: 'q57', n: 57, act: 6, name: "Horseshoe", par: 9,
     hint: "",
     cols: 7, rows: 7,
     shape: [[1,3],[1,4],[1,5],[1,6],[2,6]],
@@ -1809,7 +1809,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q58', n: 58, act: 6, name: "Il cortile", par: 10,
+    id: 'q58', n: 58, act: 6, name: "The Courtyard", par: 10,
     hint: "",
     cols: 7, rows: 7,
     shape: [[2,0],[1,1],[2,1],[1,2],[1,3]],
@@ -1847,7 +1847,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q59', n: 59, act: 6, name: "Il passaggio", par: 10,
+    id: 'q59', n: 59, act: 6, name: "The Passage", par: 10,
     hint: "",
     cols: 7, rows: 7,
     shape: [[5,3],[4,4],[5,4],[5,5],[5,6]],
@@ -1875,7 +1875,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q60', n: 60, act: 6, name: "Il cantiere", par: 11,
+    id: 'q60', n: 60, act: 6, name: "The Building Site", par: 11,
     hint: "",
     cols: 8, rows: 8,
     shape: [[1,0],[1,1],[2,1],[2,2],[3,2]],
@@ -1905,7 +1905,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q61', n: 61, act: 7, name: "Il passo obliquo", par: 6,
+    id: 'q61', n: 61, act: 7, name: "The Slanted Step", par: 6,
     hint: "Here every arrow is diagonal: from this act on you can move at a slant.",
     cols: 6, rows: 6,
     shape: [[4,4],[5,4],[5,5]],
@@ -1936,7 +1936,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q62', n: 62, act: 7, name: "A sghembo", par: 7,
+    id: 'q62', n: 62, act: 7, name: "Aslant", par: 7,
     hint: "",
     cols: 6, rows: 6,
     shape: [[2,1],[3,1],[3,2]],
@@ -1961,7 +1961,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q63', n: 63, act: 7, name: "La scacchiera", par: 7,
+    id: 'q63', n: 63, act: 7, name: "The Chequerboard", par: 7,
     hint: "",
     cols: 6, rows: 6,
     shape: [[1,3],[1,4],[1,5],[2,5]],
@@ -1993,7 +1993,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q64', n: 64, act: 7, name: "Il quinconce", par: 7,
+    id: 'q64', n: 64, act: 7, name: "The Quincunx", par: 7,
     hint: "",
     cols: 6, rows: 6,
     shape: [[4,2],[4,3],[3,4],[4,4]],
@@ -2024,7 +2024,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q65', n: 65, act: 7, name: "Effe", par: 8,
+    id: 'q65', n: 65, act: 7, name: "Eff", par: 8,
     hint: "",
     cols: 7, rows: 7,
     shape: [[4,5],[5,5],[3,6],[4,6]],
@@ -2066,7 +2066,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q66', n: 66, act: 7, name: "La enne", par: 8,
+    id: 'q66', n: 66, act: 7, name: "En", par: 8,
     hint: "",
     cols: 7, rows: 7,
     shape: [[2,3],[3,3],[4,3],[3,4]],
@@ -2100,7 +2100,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q67', n: 67, act: 7, name: "La ipsilon", par: 8,
+    id: 'q67', n: 67, act: 7, name: "Wye", par: 8,
     hint: "",
     cols: 7, rows: 7,
     shape: [[5,2],[6,2],[4,3],[5,3],[5,4]],
@@ -2135,7 +2135,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q68', n: 68, act: 7, name: "Il salto del cavallo", par: 10,
+    id: 'q68', n: 68, act: 7, name: "The Knight's Move", par: 10,
     hint: "",
     cols: 7, rows: 7,
     shape: [[0,1],[0,2],[0,3],[0,4],[1,4]],
@@ -2174,7 +2174,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q69', n: 69, act: 7, name: "Traverso", par: 9,
+    id: 'q69', n: 69, act: 7, name: "Athwart", par: 9,
     hint: "",
     cols: 7, rows: 7,
     shape: [[5,0],[4,1],[5,1],[4,2],[4,3]],
@@ -2209,7 +2209,7 @@ var OPERA_LEVELS = [
     ]
   },
   {
-    id: 'q70', n: 70, act: 7, name: "La deriva", par: 11,
+    id: 'q70', n: 70, act: 7, name: "The Drift", par: 11,
     hint: "",
     cols: 8, rows: 8,
     shape: [[2,2],[1,3],[2,3],[2,4],[2,5]],
