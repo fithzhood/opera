@@ -153,6 +153,15 @@ l'anteprima. `outline()` resta nel nucleo ma non serve piu' al gioco.
 Il quadretto che brucia non sparisce di soppiatto: una **fiammata** (`.ember`)
 resta un attimo dove stava.
 
+### La fiamma e' incorporata nel foglio di stile
+
+La sagoma della fiamma viene dalla libreria condivisa
+(`12-icone-linea-gameicons`, `sbed/fire.svg`, CC BY 3.0 — il credito e' in fondo
+al pannello delle regole, e il file originale sta in `assets/`). Non e' un file
+richiesto a parte ma un **data URI dentro `opera.css`**: cosi' arriva insieme al
+foglio di stile e non puo' comparire a quadro gia' aperto. Sono 409 caratteri,
+meno di quanto costerebbe una richiesta HTTP.
+
 ## Le stelle
 
 Chiudere un quadro vale **da una a tre stelle**: tre nel minimo di mosse, due

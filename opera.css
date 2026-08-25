@@ -179,12 +179,19 @@ body {
     repeating-linear-gradient(45deg, #222a35 0 6px, #1a212b 6px 12px);
   border-color: #2b3441;
 }
-/* il fuoco: brace calda, non un ostacolo — ci si passa, ma chi ci si posa brucia */
+/* Il fuoco: una fiamma vera, non una macchia. La sagoma piatta e' di sbed per
+   game-icons.net (CC BY 3.0), incorporata qui come data URI: cosi' arriva
+   insieme al foglio di stile e non c'e' una richiesta separata che possa farla
+   comparire a quadro gia' aperto. */
 .cell.fire {
-  background:
-    radial-gradient(circle at 50% 60%, rgba(226,118,34,.72) 0 32%, rgba(196,76,20,.42) 56%, rgba(196,76,20,.12) 78%),
-    repeating-linear-gradient(-45deg, rgba(190,78,20,.26) 0 5px, rgba(232,152,58,.18) 5px 10px);
-  border-color: #c08a62;
+  background-image:
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='%23c2521a' d='M256 16c-52.5 252.632-210 277.845 0 454.688C466 293.845 308.5 268.63 256 16zM124.75 167.407C98.5 243.197 46 294.117 46 369.907S151 496 229.75 496c-157.5-126.317-105-202.278-105-328.593zm262.5 0c0 126.317 52.5 202.278-105 328.593C361 496 466 445.696 466 369.907c0-75.79-52.5-126.71-78.75-202.5z'/></svg>"),
+    radial-gradient(circle at 50% 60%, rgba(232,140,52,.32) 0 42%, rgba(198,84,22,.15) 66%, transparent 82%);
+  background-repeat: no-repeat;
+  background-position: center 54%, center;
+  background-size: 56% auto, cover;
+  background-color: rgba(226,132,48,.15);
+  border-color: #cd9a72;
 }
 
 /* piano 2: la figura */
@@ -333,6 +340,8 @@ body {
 .sheet ul { margin: 0 0 18px; padding-left: 20px; color: var(--text-dim); line-height: 1.6; font-size: 14px; }
 .sheet li { margin-bottom: 7px; }
 .sheet li b { color: var(--paper-dim); }
+#crediti { margin: -6px 0 14px; font-size: 10.5px; color: #5f6b7d; text-align: center; }
+#crediti a { color: #74839a; }
 .sheet-foot { display: flex; gap: 8px; justify-content: space-between; }
 .sheet-foot.center { justify-content: center; }
 
