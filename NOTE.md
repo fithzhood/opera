@@ -126,8 +126,18 @@ giri o ribalti.
 ## Le stelle
 
 Chiudere un quadro vale **da una a tre stelle**: tre nel minimo di mosse, due
-entro **il doppio del minimo**, una comunque. Cosi' la fascia cresce da sola col
-quadro: su uno da 3 mosse bastano 6, su uno da 14 ne bastano 28. Per entrare in un quadro serve un totale
+entro **quattro volte il minimo**, una comunque. La fascia cresce da sola col
+quadro (`soglia2()` in `opera.js`), e **tutti e due i traguardi sono scritti in
+testa al quadro** — le pillole «3 stars» e «2 stars», con accesa quella ancora
+alla portata.
+
+Il pannello di fine quadro **fissa i numeri quando si vince**, non quando
+compare: fra la vittoria e il pannello passano 620 ms, e in quel mezzo secondo
+si puo' aver gia' premuto «Restart» — prima usciva «finished in 0 moves». Se nel
+frattempo si e' cambiato quadro, il pannello non compare affatto.
+
+Il titolo mostra le stelle del **tentativo appena fatto**; se il record e'
+migliore lo dice la riga sotto. Per entrare in un quadro serve un totale
 di stelle — **non** aver chiuso quello prima. Cosi' un quadro che non viene non
 blocca la strada.
 
@@ -205,6 +215,12 @@ Attenzione: nel pannello di anteprima nascosto i timer vengono strozzati a ~1s,
 quindi le prove che campionano a metà animazione non funzionano. Si aspetta uno
 stato (il contatore delle mosse che cambia), non un tempo.
 
+## La lingua
+
+**L'interfaccia e' in inglese** (agosto 2026): comandi, nomi dei quadri, titoli
+degli atti, suggerimenti, messaggi. I commenti nel codice e queste note restano
+in italiano.
+
 ## L'estetica del menu
 
 I riquadri dei quadri sono **fogli di carta** appoggiati sul fondo scuro, come la
@@ -223,6 +239,11 @@ segnale piu' riconoscibile di interfaccia fatta a macchina, l'utente l'aveva
 notata da solo — i gradienti sulle schede, i riflessi «vetrosi» in alto, le
 ombre morbide su tutto. Al loro posto: fondi pieni, un'ombra sola che regge il
 foglio, angoli appena smussati.
+
+**Annulla e rifai** sono due frecce curve grandi, in una riga tutta loro subito
+sotto il quadro (col telefono coricato passano in cima alla colonna di lato):
+in un rompicapo sono i comandi che si usano di piu' e vanno raggiunti col
+pollice senza cercarli. Il rifai ha la sua pila e una mossa nuova la cancella.
 
 Il testo **non e' selezionabile** (`user-select: none` su `html, body`): vale
 per tutte le app dell'utente tranne quelle per scrivere. Vedi la memoria

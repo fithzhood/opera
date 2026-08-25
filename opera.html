@@ -1,26 +1,27 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <title>Opera</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
-<meta name="description" content="Rompicapo di traslazioni, rotazioni e simmetrie su griglia quadrata.">
+<meta name="description" content="A puzzle of slides, turns and mirrors on a square grid.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%224%22%20fill%3D%22%23e9e3d5%22/%3E%3Cpath%20d%3D%22M5%205h13v9h9v13H14v-9H5z%22%20fill%3D%22%23b03729%22/%3E%3C/svg%3E">
-<link rel="stylesheet" href="opera.css?v=20">
+<link rel="stylesheet" href="opera.css?v=22">
 </head>
 <body>
 
 <div id="app">
 
   <header id="top">
-    <button class="tool" id="btnLevels">Quadri</button>
+    <button class="tool" id="btnLevels">Levels</button>
     <h1 id="brand">Opera</h1>
     <div id="score">
-      <div class="pill"><span>Quadro</span><b id="levNum">1</b></div>
-      <div class="pill"><span>Mosse</span><b id="moveCount">0</b></div>
-      <div class="pill"><span>Minimo</span><b id="parVal">–</b></div>
+      <div class="pill"><span>Level</span><b id="levNum">1</b></div>
+      <div class="pill"><span>Moves</span><b id="moveCount">0</b></div>
+      <div class="pill goal3"><span>3 stars</span><b id="par3">–</b></div>
+      <div class="pill goal2"><span>2 stars</span><b id="par2">–</b></div>
     </div>
   </header>
 
@@ -34,28 +35,28 @@
         <div class="layer" id="marks"></div>
       </div>
     </div>
-    <p id="hint"></p>
-  </main>
-
-  <footer id="tools">
-    <div id="storia">
-      <button class="tool icon" id="btnUndo" title="Annulla (Z)" aria-label="Annulla">
+    <div id="azioni">
+      <button class="tool icon" id="btnUndo" title="Undo (Z)" aria-label="Undo">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M9 7H14.2a4.8 4.8 0 0 1 0 9.6H9.6"/>
           <path d="M11.6 4.2 8.4 7l3.2 2.8"/>
         </svg>
       </button>
-      <button class="tool icon" id="btnRedo" title="Rifai (Y)" aria-label="Rifai">
+      <button class="tool icon" id="btnRedo" title="Redo (Y)" aria-label="Redo">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M15 7H9.8a4.8 4.8 0 0 0 0 9.6h4.6"/>
           <path d="M12.4 4.2 15.6 7l-3.2 2.8"/>
         </svg>
       </button>
     </div>
-    <button class="tool" id="btnReset">Ricomincia</button>
-    <button class="tool" id="btnHint">Aiuto</button>
-    <button class="tool toggle" id="btnPreview">Anteprima</button>
-    <button class="tool" id="btnRules">Regole</button>
+    <p id="hint"></p>
+  </main>
+
+  <footer id="tools">
+    <button class="tool" id="btnReset">Restart</button>
+    <button class="tool" id="btnHint">Hint</button>
+    <button class="tool toggle" id="btnPreview">Preview</button>
+    <button class="tool" id="btnRules">Rules</button>
   </footer>
 
   <section id="menu">
@@ -63,11 +64,11 @@
       <p id="menuLine"></p>
       <div id="menuBar"><i></i></div>
     </div>
-    <button class="tool primary" id="btnPlay">Comincia</button>
+    <button class="tool primary" id="btnPlay">Start</button>
     <div id="pickerGrid"></div>
     <div id="menuFoot">
-      <button class="tool" id="btnRulesMenu">Regole</button>
-      <button class="tool danger" id="btnWipe">Azzera i progressi</button>
+      <button class="tool" id="btnRulesMenu">Rules</button>
+      <button class="tool danger" id="btnWipe">Reset progress</button>
     </div>
   </section>
 
@@ -76,38 +77,39 @@
 
 <div class="overlay" id="win">
   <div class="sheet narrow">
-    <h2 id="winTitle">Risolto</h2>
+    <h2 id="winTitle">Solved</h2>
     <p id="winLine"></p>
     <div class="sheet-foot center">
-      <button class="tool" id="btnAgain">Rigioca</button>
-      <button class="tool" id="btnMenuWin">Ai quadri</button>
-      <button class="tool primary" id="btnNext">Quadro seguente</button>
+      <button class="tool" id="btnAgain">Replay</button>
+      <button class="tool" id="btnMenuWin">Levels</button>
+      <button class="tool primary" id="btnNext">Next level</button>
     </div>
   </div>
 </div>
 
 <div class="overlay" id="howto">
   <div class="sheet narrow">
-    <h2>Come si gioca</h2>
+    <h2>How to play</h2>
     <ul id="howtoList">
-      <li>La figura va portata esattamente dentro la <b>sagoma tratteggiata</b>.</li>
-      <li>Ogni quadretto disegnato è un <b>pulsante</b>, ma funziona solo se la figura ci sta sopra: i pulsanti accesi sono quelli chiari, sul corpo della figura.</li>
-      <li>Le <b>punte</b> spostano: una punta una casella, due punte due caselle, tre punte tre.</li>
-      <li>La <b>freccia curva</b> gira la figura di un quarto di giro (o di mezzo giro) attorno al quadretto premuto.</li>
-      <li>L'<b>asse tratteggiato</b> ribalta la figura; l'asse passa per il quadretto premuto e può essere anche obliquo.</li>
-      <li>Le caselle scure sono <b>muri</b>: la figura non ci finisce sopra, e non ci passa nemmeno attraverso — nemmeno girando.</li>
-      <li>Una mossa che porterebbe la figura fuori dal quadro non si può fare.</li>
-      <li>Le due frecce in basso <b>annullano</b> e <b>rifanno</b> le mosse: si può provare senza paura.</li>
-      <li>Chiudere un quadro dà da una a tre <b>stelle</b>: tre se ci riesci nel minimo di mosse, due se non superi il doppio del minimo. Le stelle aprono i quadri seguenti, così un quadro che non viene non ti blocca la strada.</li>
+      <li>Bring the figure exactly inside the <b>dashed outline</b>.</li>
+      <li>Every drawn square is a <b>button</b>, but it only works while the figure stands on it: the lit ones are the pale symbols, on the body of the figure.</li>
+      <li>The <b>arrowheads</b> slide it: one head one square, two heads two, three heads three.</li>
+      <li>The <b>curved arrow</b> turns the figure a quarter turn — or a half turn — around the square you press.</li>
+      <li>The <b>dashed axis</b> flips the figure; the axis runs through the square you press, and may be slanted.</li>
+      <li>Dark squares are <b>walls</b>: the figure can't land on them, and can't pass through them — not even by turning.</li>
+      <li>A move that would take the figure off the board can't be made.</li>
+      <li>The two arrows under the board <b>undo</b> and <b>redo</b> your moves: you can try things without fear.</li>
+      <li>Finishing a level earns one to three <b>stars</b>: three in the fewest moves, two within four times that. Both targets are shown at the top.</li>
+      <li>Stars unlock later levels, so a level you can't crack never blocks your way.</li>
     </ul>
     <div class="sheet-foot center">
-      <button class="tool primary" id="btnCloseHowto">Ho capito</button>
+      <button class="tool primary" id="btnCloseHowto">Got it</button>
     </div>
   </div>
 </div>
 
-<script src="opera-core.js?v=20"></script>
-<script src="opera-levels.js?v=20"></script>
-<script src="opera.js?v=20"></script>
+<script src="opera-core.js?v=22"></script>
+<script src="opera-levels.js?v=22"></script>
+<script src="opera.js?v=22"></script>
 </body>
 </html>

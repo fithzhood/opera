@@ -122,8 +122,8 @@
       return op.d === 180 ? 'gira di mezzo giro'
            : 'gira di un quarto di giro ' + (op.d === 90 ? 'in senso orario' : 'in senso antiorario');
     }
-    return 'ribalta rispetto all’asse ' +
-      { v: 'verticale', h: 'orizzontale', d1: 'obliquo “\\”', d2: 'obliquo “/”' }[op.a];
+    return 'flip across the ' +
+      { v: 'upright', h: 'level', d1: 'slanted backward', d2: 'slanted forward' }[op.a] + ' axis';
   }
 
   /* ================= disegno ================= */
@@ -254,13 +254,20 @@
   /* Col telefono coricato il nome del quadro e il suggerimento si spostano nella
      colonna di lato, cosi' l'altezza resta tutta al quadro. */
   function placeChrome(rail) {
-    var name = $('levelName'), hint = $('hint'), top = $('top'), stage = $('stage'), tools = $('tools');
+    var name = $('levelName'), hint = $('hint'), azioni = $('azioni'),
+        top = $('top'), stage = $('stage'), tools = $('tools');
     if (rail) {
       if (name.parentNode !== top) top.appendChild(name);
+      /* coricati: annulla e rifai in cima alla colonna dei comandi */
+      if (azioni.parentNode !== tools) tools.insertBefore(azioni, tools.firstChild);
       if (hint.parentNode !== tools) tools.appendChild(hint);
     } else {
       if (name.parentNode !== stage) stage.insertBefore(name, stage.firstChild);
-      if (hint.parentNode !== stage) stage.appendChild(hint);
+      /* da fermi: subito sotto il quadro, prima della riga di aiuto */
+      if (azioni.parentNode !== stage || azioni.nextElementSibling !== hint) {
+        stage.appendChild(azioni);
+        stage.appendChild(hint);
+      }
     }
   }
 
@@ -293,7 +300,12 @@
     drawMarks();
     updateControls();
     $('moveCount').textContent = S.moves;
-    $('parVal').textContent = S.level.par;
+    $('par3').textContent = S.level.par;
+    $('par2').textContent = soglia2(S.level.par);
+    /* dei due traguardi si accende quello ancora alla portata */
+    $('par3').parentNode.classList.toggle('vivo', S.moves <= S.level.par);
+    $('par2').parentNode.classList.toggle('vivo',
+      S.moves > S.level.par && S.moves <= soglia2(S.level.par));
     $('levNum').textContent = S.level.n;
     $('btnUndo').disabled = S.history.length === 0 || S.busy;
     $('btnRedo').disabled = S.future.length === 0 || S.busy;
@@ -372,12 +384,12 @@
     var res = C.apply(S.cells, [b.x, b.y], b.op);
     if (!C.isLegal(res, lv)) {
       shake();
-      say('Quella mossa porterebbe la figura fuori dal quadro, o su un muro.');
+      say('That move would take the figure off the board, or onto a wall.');
       return;
     }
     if (!C.pathClear(S.cells, [b.x, b.y], b.op, lv)) {
       shake();
-      say('Un muro le taglia la strada: da lì non ci passa, e non ci gira nemmeno attraverso.');
+      say('A wall is in the way: it cannot pass through, and cannot turn through it either.');
       return;
     }
     S.busy = true;
@@ -406,7 +418,7 @@
   function afterMove() {
     if (C.solved(S.cells, S.level)) { win(); return; }
     var path = C.solve(S.level, S.cells);
-    if (path === null) say('Da questa posizione la sagoma non è più raggiungibile: annulla o ricomincia.');
+    if (path === null) say('From here the outline can no longer be reached: undo, or restart.');
     else say(S.level.hint || '');
   }
 
@@ -418,24 +430,34 @@
     var stellePrima = prima === undefined ? 0 : stellePer(prima, lv.par);
     var record = prima === undefined || S.moves < prima;
     if (record) { store.best[lv.id] = S.moves; saveStore(); }
-    var n = stellePer(Math.min(S.moves, prima === undefined ? S.moves : prima), lv.par);
-    var guadagnate = n - stellePrima;
+
+    /* i numeri si fissano ADESSO: il pannello compare mezzo secondo dopo, e in
+       quel mezzo secondo si puo' aver gia' premuto ricomincia */
+    var mosse = S.moves, id = lv.id, idx = S.idx;
+    var nOra = stellePer(mosse, lv.par);          /* quelle del tentativo appena fatto */
+    var n = stellePer(Math.min(mosse, prima === undefined ? mosse : prima), lv.par);
+    var guadagnate = n - stellePrima;             /* quelle che restano in cassa */
+    var totale = stelleTotali();
 
     setTimeout(function () {
-      $('winTitle').innerHTML = (S.moves === lv.par ? 'Perfetto ' : 'Risolto ') + stelleHtml(n);
-      var riga = S.moves === lv.par
-        ? 'Chiuso nel minimo possibile: ' + S.moves + ' mosse.'
-        : 'Chiuso in ' + S.moves + ' mosse. Il minimo è ' + lv.par + '.';
+      /* se nel frattempo si e' cambiato quadro o ricominciato, niente pannello */
+      if (!S.level || S.level.id !== id || !C.solved(S.cells, S.level)) return;
+
+      $('winTitle').innerHTML = (mosse === lv.par ? 'Perfect ' : 'Solved ') + stelleHtml(nOra);
+      var riga = mosse === lv.par
+        ? 'Finished in the fewest moves possible: ' + mosse + '.'
+        : 'Finished in ' + mosse + ' moves. Three stars were at ' + lv.par +
+          ', two at ' + soglia2(lv.par) + '.';
       if (guadagnate > 0)
-        riga += ' Hai guadagnato ' + (guadagnate === 1 ? 'una stella' : guadagnate + ' stelle') +
-                ': ora ne hai ' + stelleTotali() + '.';
+        riga += ' You earned ' + (guadagnate === 1 ? 'a star' : guadagnate + ' stars') +
+                ': you now have ' + totale + '.';
       else if (!record && prima !== undefined)
-        riga += ' Il tuo record resta ' + prima + '.';
+        riga += ' Your best is still ' + prima + ', worth ' + n + (n === 1 ? ' star.' : ' stars.');
       $('winLine').textContent = riga;
 
-      var seguente = S.idx + 1;
+      var seguente = idx + 1;
       var puoi = seguente < LEVELS.length && aperto(seguente);
-      $('btnNext').textContent = puoi ? 'Quadro seguente' : 'Ai quadri';
+      $('btnNext').textContent = puoi ? 'Next level' : 'Levels';
       $('btnNext').dataset.vai = puoi ? seguente : -1;
       open$('win');
     }, 620);
@@ -500,12 +522,12 @@
   function hint() {
     if (S.busy) return;
     var path = C.solve(S.level, S.cells);
-    if (path === null) { say('Da questa posizione la sagoma non è più raggiungibile: annulla o ricomincia.'); return; }
-    if (!path.length) { say('Ci sei già.'); return; }
+    if (path === null) { say('From here the outline can no longer be reached: undo, or restart.'); return; }
+    if (!path.length) { say('You are already there.'); return; }
     S.hintIdx = path[0];
     updateControls();
-    say('Da qui bastano ' + path.length + (path.length === 1 ? ' mossa' : ' mosse') +
-        '. Il pulsante cerchiato è una mossa giusta.');
+    say('From here ' + path.length + (path.length === 1 ? ' move is' : ' moves are') +
+        ' enough. The ringed square is a right one.');
   }
 
   /* ================= anteprima al passaggio del mouse ================= */
@@ -543,10 +565,13 @@
 
   function risolto(i) { return store.best[LEVELS[i].id] !== undefined; }
 
-  /* Tre stelle nel minimo di mosse, due entro il doppio del minimo, una
-     comunque: la fascia cresce col quadro senza bisogno di correzioni. */
+  /* Tre stelle nel minimo di mosse, due entro quattro volte il minimo, una
+     comunque. Tutti e due i traguardi sono scritti in testa al quadro, cosi'
+     si sa sempre quante mosse restano prima di perdere una stella. */
+  var FATTORE2 = 4;
+  function soglia2(par) { return par * FATTORE2; }
   function stellePer(n, par) {
-    return n <= par ? 3 : n <= par * 2 ? 2 : 1;
+    return n <= par ? 3 : n <= soglia2(par) ? 2 : 1;
   }
 
   function stelleDi(i) {
@@ -613,14 +638,15 @@
       var vicino = mancano <= 3 ? ' vicino' : '';
       return '<div class="lv locked' + vicino + '" aria-disabled="true">' +
                '<span class="lv-top"><span class="num">' + lv.n + '</span>' + LUCCHETTO + '</span>' +
-               '<span class="st">ancora ' + mancano + ' ★</span>' +
+               '<span class="st">' + mancano + ' ★ to go</span>' +
              '</div>';
     }
     var cls = 'lv';
     if (best !== undefined) cls += n === 3 ? ' done perfect' : ' done';
     if (i === prossimo && best === undefined) cls += ' next';
     var st = best === undefined
-      ? (i === prossimo ? '<em class="ora">da fare</em> · minimo ' + lv.par : 'minimo ' + lv.par)
+      ? (i === prossimo ? '<em class="ora">next</em> · 3★ ' + lv.par + ' · 2★ ' + soglia2(lv.par)
+                        : '3★ ' + lv.par + ' · 2★ ' + soglia2(lv.par))
       : stelleHtml(n) + ' <span class="mosse">' + best + '/' + lv.par + '</span>';
     return '<button class="' + cls + '" data-lv="' + i + '">' +
              '<span class="lv-top"><span class="num">' + lv.n + '</span>' +
@@ -652,8 +678,8 @@
       var testa = qualcunoAperto
         ? '<span class="act-t">' + atto.title + '</span>' +
           '<span class="act-note">' + atto.note + '</span>'
-        : '<span class="act-t da-scoprire">Da scoprire</span>' +
-          '<span class="act-note">Si apre con ' + soglia(primoDentro) + ' stelle.</span>';
+        : '<span class="act-t da-scoprire">Still to come</span>' +
+          '<span class="act-note">Opens at ' + soglia(primoDentro) + ' stars.</span>';
 
       html += '<section class="act' + (qualcunoAperto ? '' : ' act-locked') +
                 (chiuse === dentro.length ? ' act-done' : '') + '">' +
@@ -672,14 +698,14 @@
 
     $('menuLine').innerHTML =
       '<b class="conta">' + totale + '</b><span class="astro">★</span>' +
-      '<span class="su">su ' + massimo + '</span>' +
-      '<span class="sep">·</span>' + fatti + ' quadri chiusi su ' + LEVELS.length;
+      '<span class="su">of ' + massimo + '</span>' +
+      '<span class="sep">·</span>' + fatti + ' of ' + LEVELS.length + ' levels done';
     $('menuBar').firstChild.style.width = Math.round(totale / massimo * 100) + '%';
 
     var tutti = fatti === LEVELS.length;
     $('btnPlay').textContent = tutti
-      ? 'Rigioca il primo'
-      : fatti === 0 ? 'Comincia' : 'Riprendi dal quadro ' + LEVELS[prossimo].n;
+      ? 'Replay the first'
+      : fatti === 0 ? 'Start' : 'Resume at level ' + LEVELS[prossimo].n;
     $('btnPlay').dataset.lv = prossimo < 0 ? 0 : prossimo;
 
     var segno = $('pickerGrid').querySelector('.lv.next');
@@ -740,7 +766,7 @@
       if (b) loadLevel(+b.dataset.lv);
     });
     $('btnWipe').onclick = function () {
-      if (!confirm('Cancello tutti i risultati salvati? I quadri tornano da aprire.')) return;
+      if (!confirm('Erase every saved result? All levels go back to locked.')) return;
       store = { best: {}, preview: store.preview };
       saveStore(); buildMenu();
     };

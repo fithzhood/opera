@@ -90,6 +90,12 @@ body {
 .pill span { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); }
 .pill b { font-size: 17px; font-variant-numeric: tabular-nums; }
 .pill.perfect b { color: var(--gold); }
+/* dei due traguardi si accende quello ancora alla portata */
+.pill.goal3.vivo { border-color: var(--gold-soft); }
+.pill.goal3.vivo b { color: var(--gold); }
+.pill.goal2.vivo { border-color: #4d6a58; }
+.pill.goal2.vivo b { color: #8dae8d; }
+.pill.goal3:not(.vivo) b, .pill.goal2:not(.vivo) b { color: var(--text-dim); }
 
 /* ---------- pulsanti di servizio ---------- */
 
@@ -262,16 +268,16 @@ body {
 
 #tools { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; align-items: center; }
 
-/* annulla e rifai: le due frecce classiche, staccate dal resto e piu' grandi,
-   perche' in un rompicapo sono i comandi che si usano di piu' */
-#storia { display: flex; gap: 6px; padding-right: 10px; margin-right: 2px; border-right: 1px solid var(--ink-line); }
-.tool.icon { padding: 6px 12px; display: grid; place-items: center; }
+/* Annulla e rifai stanno subito sotto il quadro, grandi: in un rompicapo sono
+   i comandi che si usano di piu', e vanno raggiunti col pollice senza cercarli. */
+#azioni { display: flex; gap: 12px; justify-content: center; }
+.tool.icon { padding: 9px 24px; display: grid; place-items: center; }
 .tool.icon svg {
-  width: 22px; height: 22px; display: block;
-  fill: none; stroke: currentColor; stroke-width: 2.1;
+  width: 26px; height: 26px; display: block;
+  fill: none; stroke: currentColor; stroke-width: 2.2;
   stroke-linecap: round; stroke-linejoin: round;
 }
-.tool.icon:not(:disabled) { color: var(--paper-dim); border-color: #3a4757; }
+.tool.icon:not(:disabled) { color: var(--paper-dim); border-color: #46566b; }
 .tool.icon:not(:disabled):hover { color: var(--gold); border-color: var(--gold-soft); }
 
 /* ---------- pannelli ---------- */
@@ -481,7 +487,8 @@ body {
      o finisce sulla stessa riga del pulsante dei quadri */
   #brand { order: -1; flex: 0 0 100%; font-size: 21px; }
   #score { margin-left: auto; }
-  .pill { min-width: 54px; padding: 4px 8px; }
+  .pill { min-width: 46px; padding: 4px 7px; }
+  .pill span { font-size: 9px; letter-spacing: .06em; }
   #app { padding: calc(10px + var(--sa-t)) calc(10px + var(--sa-r))
                  calc(14px + var(--sa-b)) calc(10px + var(--sa-l)); }
 }
@@ -532,7 +539,8 @@ body.capacitor { --sa-t: max(env(safe-area-inset-top, 0px), 34px); }
   #brand { order: -2; flex: 0 0 auto; width: auto; font-size: 16px; letter-spacing: .12em; }
   #levelName { order: -1; font-size: 13px; text-align: center; }
   #btnLevels { order: 1; }
-  #score { flex-direction: column; gap: 4px; }
+  /* quattro pillole in colonna mangerebbero mezza barra: due per riga */
+  #score { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
   .pill { flex-direction: row; justify-content: space-between; align-items: baseline; min-width: 0; padding: 2px 8px; }
   .pill span { font-size: 9px; }
   .pill b { font-size: 14px; }
@@ -542,9 +550,9 @@ body.capacitor { --sa-t: max(env(safe-area-inset-top, 0px), 34px); }
     flex-wrap: nowrap; gap: 5px; overflow-y: auto;
   }
   #tools .tool { padding: 6px 8px; font-size: 12px; }
-  #storia { padding: 0 0 6px; margin: 0 0 2px; border-right: 0; border-bottom: 1px solid var(--ink-line); justify-content: center; }
-  #tools .tool.icon { padding: 5px 10px; }
-  #tools .tool.icon svg { width: 19px; height: 19px; }
+  #azioni { gap: 8px; padding-bottom: 6px; margin-bottom: 2px; border-bottom: 1px solid var(--ink-line); }
+  #tools .tool.icon { padding: 7px 10px; }
+  #tools .tool.icon svg { width: 22px; height: 22px; }
   #hint { font-size: 11px; text-align: left; min-height: 0; margin-top: 4px; max-width: none; }
   #stage { grid-area: stage; gap: 0; }
   .sheet { padding: 16px 18px; max-height: 92vh; }
