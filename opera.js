@@ -179,19 +179,46 @@
   /* La figura e' rossa mentre la si muove e diventa verde solo quando e' tutta
      dentro la sagoma: il verde vale "a posto", non "a meta' strada". Il colore
      lo decide la classe .won sul contenitore, che sopravvive al ridisegno. */
+  /* Gli scostamenti da disegnare: uno solo di norma, nove sui quadri col bordo
+     che si richiude. La figura sta in coordinate distese e puo' sporgere oltre
+     il bordo: la copia spostata di una griglia rientra dall'altra parte, e il
+     quadro ritaglia il resto. E' cosi' che lo scavalco si vede muoversi invece
+     di teletrasportarsi. */
+  function copie() {
+    if (!S.level.wrap) return [[0, 0]];
+    var out = [], dx, dy;
+    for (dx = -1; dx <= 1; dx++) for (dy = -1; dy <= 1; dy++) out.push([dx, dy]);
+    return out;
+  }
+
+  function spostate(cells, ox, oy) {
+    var out = new Array(cells.length), i;
+    for (i = 0; i < cells.length; i++) out[i] = [cells[i][0] + ox, cells[i][1] + oy];
+    return out;
+  }
+
   function drawFigure() {
     var b = boardSize(), w = b[0], h = b[1], cell = b[2];
+    var lv = S.level, gruppi = '', c = copie(), i, ox, oy, celle;
+    for (i = 0; i < c.length; i++) {
+      ox = c[i][0] * lv.cols; oy = c[i][1] * lv.rows;
+      celle = spostate(S.cells, ox, oy);
+      gruppi += '<g class="copia" data-ox="' + ox + '" data-oy="' + oy + '">' +
+                  '<path class="fig-body" d="' + cellsPath(celle, cell) + '"/>' +
+                  '<path class="fig-seam" d="' + seamsPath(celle, cell) + '" fill="none"/>' +
+                  '<path class="fig-edge" d="' + edgePath(celle, cell) + '"/>' +
+                '</g>';
+    }
     $('figure').innerHTML =
       '<svg width="' + w + '" height="' + h + '" xmlns="http://www.w3.org/2000/svg">' +
-        '<path class="fig-body" d="' + cellsPath(S.cells, cell) + '"/>' +
-        '<path class="fig-seam" d="' + seamsPath(S.cells, cell) + '" fill="none"/>' +
-        '<path class="fig-edge" d="' + edgePath(S.cells, cell) + '"/>' +
-      '</svg>';
+        gruppi + '</svg>';
   }
 
   function drawMarks() {
     var b = boardSize(), w = b[0], h = b[1], cell = b[2];
-    var dt = edgePath(S.level.target, cell);
+    var c = copie(), lv = S.level, dt = '', k;
+    for (k = 0; k < c.length; k++)
+      dt += edgePath(spostate(lv.target, c[k][0] * lv.cols, c[k][1] * lv.rows), cell);
     /* due passate: un alone chiaro sotto e le trattine scure sopra. Senza alone
        il tratteggio sparisce dove la figura e' gia' appoggiata sulla sagoma. */
     var parts = '<path class="target-halo" d="' + dt + '"/>' +
@@ -209,11 +236,39 @@
       if (S.ghost.pivot && S.ghost.axis === undefined && S.ghost.spin)
         parts += '<circle class="pivot-dot" cx="' + f((S.ghost.pivot[0] + .5) * cell) +
                  '" cy="' + f((S.ghost.pivot[1] + .5) * cell) + '" r="4"/>';
-      parts += '<path class="ghost-fill" d="' + cellsPath(S.ghost.cells, cell) + '"/>' +
-               '<path class="ghost-edge" d="' + edgePath(S.ghost.cells, cell) + '"/>';
+      var gf = '', ge = '', j, gc;
+      for (j = 0; j < c.length; j++) {
+        gc = spostate(S.ghost.cells, c[j][0] * lv.cols, c[j][1] * lv.rows);
+        gf += cellsPath(gc, cell); ge += edgePath(gc, cell);
+      }
+      parts += '<path class="ghost-fill" d="' + gf + '"/>' +
+               '<path class="ghost-edge" d="' + ge + '"/>';
     }
+    if (lv.wrap) parts += segniWrap(w, h, cell);
     $('marks').innerHTML =
       '<svg width="' + w + '" height="' + h + '" xmlns="http://www.w3.org/2000/svg">' + parts + '</svg>';
+  }
+
+  /* I quattro bordi che si richiudono: una doppia punta rivolta in fuori a
+     meta' di ogni lato. Insieme all'anello attorno al quadro dicono a colpo
+     d'occhio che di qui si esce e si rientra dall'altra parte. */
+  function segniWrap(w, h, cell) {
+    var d = Math.max(7, Math.min(11, cell * 0.16)), g = d * 0.62, out = '';
+    function punta(cx, cy, ang) {
+      var t = ang * Math.PI / 180, ux = Math.cos(t), uy = Math.sin(t);
+      var nx = -uy, ny = ux, s = '';
+      for (var k = 0; k < 2; k++) {
+        var bx = cx + ux * (k * g), by = cy + uy * (k * g);
+        s += 'M' + f(bx - ux * d * .5 + nx * d * .55) + ' ' + f(by - uy * d * .5 + ny * d * .55) +
+             'L' + f(bx + ux * d * .5) + ' ' + f(by + uy * d * .5) +
+             'L' + f(bx - ux * d * .5 - nx * d * .55) + ' ' + f(by - uy * d * .5 - ny * d * .55);
+      }
+      return s;
+    }
+    var m = d * 1.5;
+    out += punta(w / 2, m, -90) + punta(w / 2, h - m, 90) +
+           punta(m, h / 2, 180) + punta(w - m, h / 2, 0);
+    return '<path class="wrap-mark" d="' + out + '"/>';
   }
 
   function buildCells() {
@@ -325,13 +380,29 @@
 
   /* ================= animazione ================= */
 
-  function tween(node, transform, ms) {
+  /* Ogni copia si trasforma attorno al PROPRIO perno: se ruotassero tutte
+     attorno a quello della copia centrale, quelle di lato descriverebbero un
+     arco sbagliato e lo scavalco si vedrebbe storto. */
+  function gruppi() { return $('figure').querySelectorAll('.copia'); }
+
+  function tween(transform, ms, perno, cell) {
     return new Promise(function (res) {
-      node.style.transition = 'transform ' + ms + 'ms cubic-bezier(.34,.05,.2,1)';
-      void node.offsetWidth;
-      node.style.transform = transform;
+      var g = gruppi(), i, ox, oy;
+      for (i = 0; i < g.length; i++) {
+        ox = +(g[i].dataset.ox || 0); oy = +(g[i].dataset.oy || 0);
+        g[i].style.transformOrigin =
+          f((perno[0] + ox + .5) * cell) + 'px ' + f((perno[1] + oy + .5) * cell) + 'px';
+        g[i].style.transition = 'transform ' + ms + 'ms cubic-bezier(.34,.05,.2,1)';
+      }
+      void $('figure').offsetWidth;
+      for (i = 0; i < g.length; i++) g[i].style.transform = transform;
       setTimeout(res, ms + 15);
     });
+  }
+
+  function fermaGruppi() {
+    var g = gruppi(), i;
+    for (i = 0; i < g.length; i++) { g[i].style.transition = 'none'; g[i].style.transform = 'none'; }
   }
 
   /* La trasformazione finale che l'animazione deve raggiungere, in coordinate
@@ -346,9 +417,8 @@
     return 'rotate(' + A + 'deg) scaleY(-1) rotate(' + (-A) + 'deg)';
   }
 
-  function animateMove(b, op) {
-    var fig = $('figure'), cell = cellPx();
-    fig.style.transformOrigin = ((b.x + .5) * cell) + 'px ' + ((b.y + .5) * cell) + 'px';
+  function animateMove(perno, op) {
+    var cell = cellPx();
 
     if (op.k === 'm') {
       /* passo per passo: si vede di quante caselle si sposta */
@@ -357,35 +427,30 @@
       var chain = Promise.resolve();
       for (var i = 1; i <= steps; i++) (function (k) {
         chain = chain.then(function () {
-          return tween(fig, 'translate(' + f(sx * k * cell) + 'px,' + f(sy * k * cell) + 'px)', 135);
+          return tween('translate(' + f(sx * k * cell) + 'px,' + f(sy * k * cell) + 'px)',
+                       135, perno, cell);
         });
       })(i);
       return chain;
     }
 
     if (op.k === 'r') {
-      var verso = op.d === 180 ? (C.spin(S.cells, [b.x, b.y], op, S.level) || 1) : 1;
-      return tween(fig, transformFor(op, cell, verso), op.d === 180 ? 520 : 380);
+      var verso = op.d === 180 ? (C.spin(S.cells, perno, op, S.level) || 1) : 1;
+      return tween(transformFor(op, cell, verso), op.d === 180 ? 520 : 380, perno, cell);
     }
 
     /* il ribaltamento parte dalla stessa forma con scaleY(1): cosi' il passaggio
        da 1 a -1 si interpola schiacciando la figura, che e' l'aria del gesto */
-    var A = AXIS_ANGLE[op.a];
-    fig.style.transition = 'none';
-    fig.style.transform = 'rotate(' + A + 'deg) scaleY(1) rotate(' + (-A) + 'deg)';
-    void fig.offsetWidth;
-    return tween(fig, transformFor(op, cell), 460);
-  }
-
-  /* un guizzo dove il quadretto e' bruciato, per non farlo sparire di soppiatto */
-  function fiammata(celle) {
-    var cell = cellPx(), html = '', i;
-    for (i = 0; i < celle.length; i++)
-      html += '<i class="ember" style="left:' + f(celle[i][0] * cell) + 'px;top:' +
-              f(celle[i][1] * cell) + 'px;width:' + cell + 'px;height:' + cell + 'px"></i>';
-    var l = $('brucia');
-    l.innerHTML = html;
-    setTimeout(function () { if (l.innerHTML === html) l.innerHTML = ''; }, 900);
+    var A = AXIS_ANGLE[op.a], g = gruppi(), j, ox, oy;
+    for (j = 0; j < g.length; j++) {
+      ox = +(g[j].dataset.ox || 0); oy = +(g[j].dataset.oy || 0);
+      g[j].style.transition = 'none';
+      g[j].style.transformOrigin =
+        f((perno[0] + ox + .5) * cell) + 'px ' + f((perno[1] + oy + .5) * cell) + 'px';
+      g[j].style.transform = 'rotate(' + A + 'deg) scaleY(1) rotate(' + (-A) + 'deg)';
+    }
+    void $('figure').offsetWidth;
+    return tween(transformFor(op, cell), 460, perno, cell);
   }
 
   function shake() {
@@ -396,42 +461,43 @@
     setTimeout(function () { l.classList.remove('shake'); }, 320);
   }
 
+  /* Il guizzo di fiamma sul quadretto che si perde: le celle arrivano gia'
+     ripiegate sul quadro, quindi vale anche sui livelli che si richiudono. */
+  function fiammata(celle) {
+    var cell = cellPx(), html = '', i;
+    for (i = 0; i < celle.length; i++)
+      html += '<i class="ember" style="left:' + f(celle[i][0] * cell) + 'px;top:' +
+              f(celle[i][1] * cell) + 'px;width:' + cell + 'px;height:' + cell + 'px"></i>';
+    var l = $('brucia');
+    l.innerHTML = html;
+    setTimeout(function () { if (l.innerHTML === html) l.innerHTML = ''; }, 900);
+  }
+
   /* ================= partita ================= */
 
   function press(i) {
     if (S.busy) return;
-    var lv = S.level, b = lv.buttons[i];
-    if (!C.covers(S.cells, b.x, b.y)) return;
-    var res = C.apply(S.cells, [b.x, b.y], b.op);
-    if (!C.isLegal(res, lv)) {
-      shake();
-      say('No room: that move would not fit.');
-      return;
-    }
-    if (!C.pathClear(S.cells, [b.x, b.y], b.op, lv)) {
-      shake();
-      say('A wall blocks the way.');
-      return;
-    }
-    /* il fuoco brucia dove la figura si posa, non dove passa */
+    var lv = S.level, ms = C.moves(S.cells, lv), m = null, k;
+    for (k = 0; k < ms.length; k++) if (ms[k].index === i) { m = ms[k]; break; }
+    if (!m) return;                       /* la figura non lo copre */
+    if (m.fuori)         { shake(); say('No room: that move would not fit.'); return; }
+    if (m.murata)        { shake(); say('A wall blocks the way.'); return; }
+    if (m.tuttoBruciato) { shake(); say('That would burn the whole figure.'); return; }
+
+    var op = m.button.op, perno = m.perno, dopo = m.cells;
+    /* dove sono i quadretti che bruciano, per il guizzo */
     var fuoco = lv.fire && lv.fire.length ? C.fireSet(lv) : null;
-    var dopo = C.burn(res, fuoco);
-    if (!dopo.length) {
-      shake();
-      say('That would burn the whole figure.');
-      return;
-    }
-    var bruciati = res.filter(function (c) { return fuoco && fuoco[c[0] + ',' + c[1]]; });
+    var atterrate = C.onBoard(C.apply(S.cells, perno, op), lv);
+    var bruciati = fuoco ? atterrate.filter(function (c) { return fuoco[c[0] + ',' + c[1]]; }) : [];
+
     S.busy = true;
     S.hintIdx = -1;
     S.ghost = null;
     drawMarks();
     updateControls();
 
-    animateMove(b, b.op).then(function () {
-      var fig = $('figure');
-      fig.style.transition = 'none';
-      fig.style.transform = 'none';
+    animateMove(perno, op).then(function () {
+      fermaGruppi();
       S.history.push(S.cells);
       S.future.length = 0;      /* una mossa nuova cancella il filo del rifai */
       S.cells = dopo;
@@ -440,9 +506,11 @@
          annulla e ricomincia sono attivi, e nessuno lo richiama dopo */
       S.busy = false;
       render();
-      void fig.offsetWidth;
-      if (bruciati.length) fiammata(bruciati);
+      void $('figure').offsetWidth;
+      /* prima si decide la partita, poi si fa il fuoco d'artificio: se il
+         guizzo dovesse mai fallire, non si porta dietro la vittoria */
       afterMove();
+      if (bruciati.length) fiammata(bruciati);
     });
   }
 
@@ -523,7 +591,9 @@
     $('figure').classList.remove('won');
     $('figure').style.transition = 'none';
     $('figure').style.transform = 'none';
-    $('levelName').innerHTML = '<span class="num">' + S.level.n + '</span>' + S.level.name;
+    $('levelName').innerHTML = '<span class="num">' + S.level.n + '</span>' + S.level.name +
+      (S.level.wrap ? '<span class="chip-wrap">wrap</span>' : '');
+    $('board').classList.toggle('wrap', !!S.level.wrap);
     layout();
     buildCells();
     buildControls();
@@ -579,15 +649,15 @@
 
   function showGhost(i) {
     if (S.busy || !store.preview) return;
-    var b = S.level.buttons[i];
-    if (!C.covers(S.cells, b.x, b.y)) return;
-    var res = C.apply(S.cells, [b.x, b.y], b.op);
-    if (!C.isLegal(res, S.level)) return;
-    S.ghost = { cells: res, pivot: [b.x, b.y] };
-    if (b.op.k === 'x') S.ghost.axis = b.op.a;
-    else if (b.op.k === 'r') S.ghost.spin = true;
+    var ms = C.moves(S.cells, S.level), m = null, k;
+    for (k = 0; k < ms.length; k++) if (ms[k].index === i) { m = ms[k]; break; }
+    if (!m || !m.legal) return;
+    S.ghost = { cells: m.cells, pivot: [m.button.x, m.button.y] };
+    if (m.button.op.k === 'x') S.ghost.axis = m.button.op.a;
+    else if (m.button.op.k === 'r') S.ghost.spin = true;
     drawMarks();
   }
+
   function clearGhost() {
     if (!S.ghost) return;
     S.ghost = null;
@@ -694,7 +764,8 @@
                         : '3★ ' + lv.par + ' · 2★ ' + soglia2(lv.par))
       : stelleHtml(n) + ' <span class="mosse">' + best + '/' + lv.par + '</span>';
     return '<button class="' + cls + '" data-lv="' + i + '">' +
-             '<span class="lv-top">' + miniShape(lv.shape) + '</span>' +
+             '<span class="lv-top">' + miniShape(lv.shape) +
+               (lv.wrap ? '<i class="tag-wrap">wrap</i>' : '') + '</span>' +
              '<span class="nm"><span class="num">' + lv.n + '</span>' + lv.name + '</span>' +
              '<span class="st">' + st + '</span>' +
            '</button>';

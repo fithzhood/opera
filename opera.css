@@ -25,6 +25,9 @@
   --text:       #e6e1d6;
   --text-dim:   #97a0ad;
   --danger:     #b45a45;
+  /* il verde del bordo che si richiude: piu' acceso di quello della vittoria,
+     cosi' i due verdi non si confondono */
+  --wrap:       #16a05a;
   --cell:       64px;
   --cols:       6;
   --rows:       6;
@@ -292,6 +295,39 @@ body {
   stroke-dasharray: 5 5; stroke-linecap: round;
 }
 .pivot-dot { fill: var(--gold); }
+
+/* ---- il bordo che si richiude ---- */
+.wrap-mark {
+  fill: none; stroke: var(--wrap); stroke-width: 2.6;
+  stroke-linecap: round; stroke-linejoin: round;
+  opacity: .9;
+}
+/* Il quadro che si richiude porta un tratteggio verde tutt'attorno: sta dentro
+   il bordo perche' il quadro ritaglia quello che esce, e un alone esterno lo
+   stacca dal fondo. Non copre nulla: passa sul filo del perimetro. */
+#board.wrap { box-shadow: 0 0 0 5px rgba(22,160,90,.22), 0 18px 50px rgba(0,0,0,.55), 0 0 0 1px rgba(0,0,0,.4); }
+#board.wrap::after {
+  content: ''; position: absolute; inset: 0; z-index: 9;
+  border: 4px dashed var(--wrap);
+  border-radius: var(--radius);
+  pointer-events: none;
+}
+
+#levelName .chip-wrap {
+  margin-left: 9px; padding: 2px 7px; border-radius: 5px;
+  font-family: "Segoe UI", system-ui, sans-serif; font-style: normal;
+  font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+  color: #62d79b; background: rgba(22,160,90,.22);
+  border: 1px solid rgba(60,190,120,.5);
+  vertical-align: middle;
+}
+.lv .tag-wrap {
+  margin-left: 6px; padding: 1px 5px; border-radius: 4px;
+  font-style: normal; font-size: 9px; letter-spacing: .1em; text-transform: uppercase;
+  color: #12703f; background: rgba(22,160,90,.16);
+  border: 1px solid rgba(22,160,90,.45);
+}
+.lv.done .tag-wrap { color: #7fe0ac; background: rgba(90,215,150,.14); border-color: rgba(90,215,150,.42); }
 
 /* ---------- riga di suggerimento e barra strumenti ---------- */
 

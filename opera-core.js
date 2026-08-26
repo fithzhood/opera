@@ -64,6 +64,41 @@ var OperaCore = (function () {
     return out;
   }
 
+  /* ---------- il bordo che si richiude ----------
+     Su un quadro "wrap" il piano di gioco e' un toro: chi esce da un lato
+     rientra dall'altro. La figura pero' deve restare un corpo rigido anche a
+     cavallo della cucitura, e non lo sarebbe se tenessimo le celle gia'
+     ripiegate: ruotare un domino spezzato fra la colonna 0 e l'ultima
+     manderebbe i due quadretti in capo al mondo. Percio' lo stato tiene le
+     coordinate *distese*, normalizzate in modo che l'angolo minimo cada dentro
+     la griglia, e il ripiegamento si fa solo al momento di guardare dove sta
+     davvero la figura. */
+
+  function canon(cells, level) {
+    if (!level.wrap) return cells;
+    var mx = Infinity, my = Infinity, i;
+    for (i = 0; i < cells.length; i++) {
+      if (cells[i][0] < mx) mx = cells[i][0];
+      if (cells[i][1] < my) my = cells[i][1];
+    }
+    var dx = -Math.floor(mx / level.cols) * level.cols;
+    var dy = -Math.floor(my / level.rows) * level.rows;
+    if (!dx && !dy) return cells;
+    var out = new Array(cells.length);
+    for (i = 0; i < cells.length; i++) out[i] = [cells[i][0] + dx, cells[i][1] + dy];
+    return out;
+  }
+
+  /* dove la figura si trova davvero sulla griglia */
+  function onBoard(cells, level) {
+    if (!level.wrap) return cells;
+    var out = new Array(cells.length), i;
+    for (i = 0; i < cells.length; i++)
+      out[i] = [((cells[i][0] % level.cols) + level.cols) % level.cols,
+                ((cells[i][1] % level.rows) + level.rows) % level.rows];
+    return out;
+  }
+
   function wallSet(level) {
     var s = Object.create(null), i, w = level.walls || [];
     for (i = 0; i < w.length; i++) s[w[i][0] + ',' + w[i][1]] = true;
@@ -72,9 +107,11 @@ var OperaCore = (function () {
 
   function isLegal(cells, level, walls) {
     walls = walls || wallSet(level);
-    for (var i = 0; i < cells.length; i++) {
-      var x = cells[i][0], y = cells[i][1];
-      if (x < 0 || y < 0 || x >= level.cols || y >= level.rows) return false;
+    var c = onBoard(cells, level);
+    for (var i = 0; i < c.length; i++) {
+      var x = c[i][0], y = c[i][1];
+      /* col bordo che si richiude non si esce mai: resta solo il divieto dei muri */
+      if (!level.wrap && (x < 0 || y < 0 || x >= level.cols || y >= level.rows)) return false;
       if (walls[x + ',' + y]) return false;
     }
     return true;
@@ -107,7 +144,7 @@ var OperaCore = (function () {
      rifare la strada al contrario. */
   function arr(v) { return Math.floor(v + 0.5 + 1e-9); }
 
-  function arcoLibero(cells, pivot, da, a, verso, walls) {
+  function arcoLibero(cells, pivot, da, a, verso, walls, level) {
     var passo = 15, g, i, t, c, s2, x, y, cx, cy;
     for (g = da; g < a; g += passo) {
       t = verso * g * Math.PI / 180; c = Math.cos(t); s2 = Math.sin(t);
@@ -115,6 +152,10 @@ var OperaCore = (function () {
         x = cells[i][0] - pivot[0]; y = cells[i][1] - pivot[1];
         cx = arr(x * c - y * s2) + pivot[0];
         cy = arr(x * s2 + y * c) + pivot[1];
+        if (level && level.wrap) {
+          cx = ((cx % level.cols) + level.cols) % level.cols;
+          cy = ((cy % level.rows) + level.rows) % level.rows;
+        }
         if (walls[cx + ',' + cy]) return false;
       }
     }
@@ -129,55 +170,75 @@ var OperaCore = (function () {
     if (op.k !== 'r') return 0;
     if (op.d !== 180) {
       var v = op.d > 0 ? 1 : -1;
-      return arcoLibero(cells, pivot, 15, 90, v, walls) ? v : 0;
+      return arcoLibero(cells, pivot, 15, 90, v, walls, level) ? v : 0;
     }
-    if (arcoLibero(cells, pivot, 15, 180, 1, walls)) return 1;
-    if (arcoLibero(cells, pivot, 15, 180, -1, walls)) return -1;
+    if (arcoLibero(cells, pivot, 15, 180, 1, walls, level)) return 1;
+    if (arcoLibero(cells, pivot, 15, 180, -1, walls, level)) return -1;
     return 0;
   }
 
-  function moveSweepClear(cells, op, walls) {
+  function moveSweepClear(cells, op, walls, level) {
     var steps = Math.max(Math.abs(op.dx), Math.abs(op.dy));
-    var k, i, sx = op.dx / steps, sy = op.dy / steps;
-    for (k = 1; k < steps; k++)
-      for (i = 0; i < cells.length; i++)
-        if (walls[(cells[i][0] + sx * k) + ',' + (cells[i][1] + sy * k)]) return false;
+    var k, i, p, sx = op.dx / steps, sy = op.dy / steps;
+    for (k = 1; k < steps; k++) {
+      p = onBoard(cells.map(function (c) { return [c[0] + sx * k, c[1] + sy * k]; }), level);
+      for (i = 0; i < p.length; i++)
+        if (walls[p[i][0] + ',' + p[i][1]]) return false;
+    }
     return true;
   }
 
   /* true se nessun muro taglia la strada alla figura */
   function pathClear(cells, pivot, op, level, walls) {
     walls = walls || wallSet(level);
-    if (op.k === 'm') return moveSweepClear(cells, op, walls);
+    if (op.k === 'm') return moveSweepClear(cells, op, walls, level);
     if (op.k === 'r') return spin(cells, pivot, op, level, walls) !== 0;
     return true;   /* il ribaltamento avviene sul posto */
   }
 
   /* Tutte le mosse giocabili da una posizione: pulsante coperto dalla figura,
      risultato dentro la griglia e nessun muro sulla strada. */
+  /* il quadretto della figura, in coordinate distese, che copre una certa
+     casella della griglia — serve come perno quando il bordo si richiude */
+  function pianoDi(cells, level, x, y) {
+    var b = onBoard(cells, level), i;
+    for (i = 0; i < b.length; i++) if (b[i][0] === x && b[i][1] === y) return cells[i];
+    return null;
+  }
+
+  function bruciaSu(cells, level, fire) {
+    if (!fire) return cells;
+    var b = onBoard(cells, level), out = [], i;
+    for (i = 0; i < cells.length; i++)
+      if (!fire[b[i][0] + ',' + b[i][1]]) out.push(cells[i]);
+    return out;
+  }
+
   function moves(cells, level, walls, fire) {
     walls = walls || wallSet(level);
     if (fire === undefined) fire = level.fire && level.fire.length ? fireSet(level) : null;
-    var out = [], i, b, res, dopo, ok, libera;
+    var out = [], i, b, perno, res, dopo, ok, libera;
     for (i = 0; i < level.buttons.length; i++) {
       b = level.buttons[i];
-      if (!covers(cells, b.x, b.y)) continue;
-      res = apply(cells, [b.x, b.y], b.op);
+      perno = pianoDi(cells, level, b.x, b.y);
+      if (!perno) continue;
+      res = canon(apply(cells, perno, b.op), level);
       ok = isLegal(res, level, walls);
-      libera = pathClear(cells, [b.x, b.y], b.op, level, walls);
-      dopo = burn(res, fire);
+      libera = pathClear(cells, perno, b.op, level, walls);
+      dopo = canon(bruciaSu(res, level, fire), level);
       /* bruciare tutta la figura non si puo': resterebbe una partita senza
          niente da muovere e senza uscita */
-      if (!dopo.length) ok = false;
-      out.push({ index: i, button: b, cells: dopo,
+      var tutto = !dopo.length;
+      out.push({ index: i, button: b, cells: dopo, perno: perno,
                  brucia: res.length - dopo.length,
-                 legal: ok && libera, fuori: !ok, murata: ok && !libera });
+                 legal: ok && libera && !tutto,
+                 fuori: !ok, murata: ok && !libera, tuttoBruciato: tutto });
     }
     return out;
   }
 
   function solved(cells, level) {
-    return key(cells) === key(level.target);
+    return key(onBoard(cells, level)) === key(level.target);
   }
 
   /* Ricerca in ampiezza: cammino minimo di pulsanti dalla posizione data
@@ -294,6 +355,7 @@ var OperaCore = (function () {
   return {
     key: key, apply: apply, isLegal: isLegal, covers: covers, moves: moves,
     pathClear: pathClear, spin: spin, boundary: boundary,
+    onBoard: onBoard, canon: canon, pianoDi: pianoDi,
     fireSet: fireSet, burn: burn,
     solved: solved, solve: solve, reachable: reachable, outline: outline,
     wallSet: wallSet

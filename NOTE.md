@@ -123,6 +123,45 @@ simmetrie il verso non puo' cambiare, quindi era una richiesta impossibile.
 `needTurn` ora si spegne da solo quando la tavolozza non contiene niente che
 giri o ribalti.
 
+## Il bordo che si richiude
+
+Dieci quadri su cento (uno per atto, sempre il quarto) hanno il **bordo che si
+richiude**: chi esce da un lato rientra dall'altro, in tutte e quattro le
+direzioni. Sono **semplici apposta** — niente muri, niente fuoco, e il par di
+uno dei primi quadri dell'atto: la novita' basta da sola, e sommarla al resto la
+renderebbe illeggibile. Il generatore verifica che **senza** il wrap il quadro
+sia irrisolvibile, cosi' la meccanica non e' una scorciatoia ma una necessita'.
+
+Si vedono da tre segni insieme: il **tratteggio verde tutt'attorno al quadro**,
+le doppie punte a meta' di ogni lato, e la targhetta «wrap» accanto al titolo
+(che torna anche sul riquadro nel menu). I dieci nomi alludono al giro: *Round
+the Back*, *The Loop*, *Full Circle*, *The Ring*...
+
+Il tratteggio sta **dentro** il perimetro, non fuori: il quadro ha
+`overflow: hidden` e taglierebbe qualsiasi cosa gli si disegni attorno. Fuori
+resta solo un alone, che non e' ritagliato perche' e' un'ombra dell'elemento
+stesso. Il verde e' piu' acceso (`--wrap`) di quello della vittoria, cosi' i due
+non si confondono: uno tinge la figura, l'altro incornicia il quadro.
+
+### Perche' lo stato tiene le coordinate distese
+
+La figura deve restare **un corpo rigido anche a cavallo della cucitura**. Se
+tenessimo le celle gia' ripiegate, un domino spezzato fra la colonna 0 e
+l'ultima non sarebbe piu' contiguo *in coordinate*, e ruotarlo manderebbe i due
+quadretti in capo al mondo. Percio' lo stato tiene le coordinate **distese**,
+normalizzate da `canon()` in modo che l'angolo minimo cada dentro la griglia, e
+il ripiegamento (`onBoard()`) si fa solo per guardare dove la figura sta
+davvero: muri, fuoco, arrivo, pulsanti coperti, disegno.
+
+### Perche' la figura si disegna nove volte
+
+Su un quadro wrap la figura si disegna **nove volte**, spostata di una griglia in
+ogni direzione; il quadro ritaglia il resto. Serve all'**animazione**: cosi' la
+parte che esce da destra si vede rientrare da sinistra invece di
+teletrasportarsi. E ogni copia si trasforma attorno al **proprio** perno — se
+ruotassero tutte attorno a quello della copia centrale, quelle di lato
+descriverebbero un arco sbagliato.
+
 ## Il fuoco
 
 Le caselle ambrate **bruciano il quadretto della figura che ci si ferma sopra**,
@@ -136,6 +175,14 @@ l'opposto del muro, ed e' voluto.
   bruciare e' obbligatorio. Nel generatore e' il flag `mustBurn`, che filtra gli
   arrivi tenendo solo quelli con meno quadretti della partenza.
 - **Atto 10**: si alternano i due casi.
+
+### La vittoria viene prima del fuoco d’artificio
+
+Nel `press()` il controllo di vittoria sta **prima** del guizzo di fiamma. Sono
+nella stessa promessa, e una promessa che salta non si lamenta con nessuno: per
+un po’ la funzione del guizzo non esisteva piu’ e i due quadri che si chiudono
+**bruciando l’ultimo quadretto** non si vincevano piu’ — senza un errore a
+schermo. Il cosmetico va sempre in fondo.
 
 Regole di contorno: la partenza non sta mai sul fuoco, i pulsanti non stanno mai
 sul fuoco, e **una mossa che brucerebbe tutta la figura e' vietata** — resterebbe
