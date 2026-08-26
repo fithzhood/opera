@@ -114,13 +114,13 @@
     if (op.k === 'm') {
       var n = Math.max(Math.abs(op.dx), Math.abs(op.dy));
       var dir = op.dx && op.dy
-        ? (op.dy < 0 ? 'in alto ' : 'in basso ') + (op.dx > 0 ? 'a destra' : 'a sinistra')
-        : op.dx > 0 ? 'a destra' : op.dx < 0 ? 'a sinistra' : op.dy > 0 ? 'in basso' : 'in alto';
-      return 'sposta di ' + n + (n === 1 ? ' casella ' : ' caselle ') + dir;
+        ? (op.dy < 0 ? 'up ' : 'down ') + (op.dx > 0 ? 'and right' : 'and left')
+        : op.dx > 0 ? 'right' : op.dx < 0 ? 'left' : op.dy > 0 ? 'down' : 'up';
+      return 'slide ' + n + (n === 1 ? ' square ' : ' squares ') + dir;
     }
     if (op.k === 'r') {
-      return op.d === 180 ? 'gira di mezzo giro'
-           : 'gira di un quarto di giro ' + (op.d === 90 ? 'in senso orario' : 'in senso antiorario');
+      return op.d === 180 ? 'turn a half turn'
+           : 'turn a quarter turn ' + (op.d === 90 ? 'clockwise' : 'anticlockwise');
     }
     return 'flip across the ' +
       { v: 'upright', h: 'level', d1: 'slanted backward', d2: 'slanted forward' }[op.a] + ' axis';
@@ -803,7 +803,7 @@
                   '<span class="act-txt">' + testa + '</span>' +
                   '<span class="act-count">' +
                     (apertiAtto && apertiAtto < dentro.length
-                      ? '<b>' + apertiAtto + ' di ' + dentro.length + ' aperti</b> · ' : '') +
+                      ? '<b>' + apertiAtto + ' of ' + dentro.length + ' open</b> · ' : '') +
                     stelleAtto + '/' + dentro.length * 3 + '<i>★</i></span>' +
                 '</header><div class="act-grid">';
       for (i = 0; i < dentro.length; i++) html += tile(dentro[i], prossimo, totale);
